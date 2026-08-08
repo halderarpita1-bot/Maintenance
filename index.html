@@ -1,4 +1,31 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Building Maintenance Ledger</title><style>body{font-family:Arial;margin:20px;max-width:900px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}input{width:100%}</style></head><body><h2>Building Maintenance Ledger</h2><table>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Building Maintenance Ledger</title><style>body{font-family:Arial;margin:20px;max-width:900px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}input{width:100%}</style></head><body><div id="loginPage">
+
+    <h2>Building Maintenance Login</h2>
+
+    <input id="loginEmail"
+           type="email"
+           placeholder="Email">
+
+    <input id="loginPassword"
+           type="password"
+           placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <p id="loginMessage"></p>
+
+</div>
+
+<div id="ledgerPage" style="display:none;">
+  
+<button onclick="logout()">Logout</button>
+<br><br>
+  
+  
+  <table>
+    
+
+    
 <tr>
     <td>Owner</td>
     <td>
@@ -26,8 +53,11 @@
     <td>Flat</td>
     <td>
         <select id="flat">
-            <option value="GF1">GF1</option>
- <option value="GF2">GF2</option>
+        
+            <option value="">-- Select flat --</option>
+ <option value="GF1">GF1</option>
+            <option value="GF2">GF2</option>
+ <option value="GF3">GF3</option>
             <option value="1stFloor 1">1stFloor 1</option>
  <option value="1stFloor 2">1stFloor 2</option>
         </select>
@@ -40,6 +70,7 @@
         <select id="type">
             <option>Maintenance Received</option>
             <option>Building Expense</option>
+            
         </select>
     </td>
 </tr>
@@ -74,6 +105,13 @@ import {
   addDoc,
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBTvD-JiSK6NniNJQrpmecTQk_qbOx3AQk",
@@ -90,6 +128,70 @@ const app = initializeApp(firebaseConfig);
 
 // Connect to Firestore
 const db = getFirestore(app);
+//Connect to Firebase authentication
+const auth = getAuth(app);
+
+
+async function login() {
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("loginMessage");
+
+    message.textContent = "Logging in...";
+
+    if (!email || !password) {
+        message.textContent = "Please enter email and password.";
+        return;
+    }
+
+    try {
+
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+        console.log("Login successful:", userCredential.user.email);
+
+        message.textContent = "Login successful!";
+
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("ledgerPage").style.display = "block";
+
+        await loadLedger();
+
+    } catch (error) {
+
+        console.error("LOGIN ERROR:", error);
+
+        message.textContent =
+            error.code + " : " + error.message;
+    }
+}
+
+async function logout() {
+
+    try {
+
+        await signOut(auth);
+
+        document.getElementById("ledgerPage").style.display = "none";
+        document.getElementById("loginPage").style.display = "block";
+
+        document.getElementById("loginEmail").value = "";
+        document.getElementById("loginPassword").value = "";
+        document.getElementById("loginMessage").textContent = "";
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Logout failed.");
+
+    }
+}
+
 
 
   
@@ -229,9 +331,33 @@ async function download() {
 }
 
 
+window.login = login;
+window.logout = logout;
 window.add = add;
 window.download = download;
 
+
+// Check whether the user is already logged in
+onAuthStateChanged(auth, (user) => {
+
+    if (user) {
+
+        // User is logged in
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("ledgerPage").style.display = "block";
+
+        loadLedger();
+
+    } else {
+
+        // User is not logged in
+        document.getElementById("loginPage").style.display = "block";
+        document.getElementById("ledgerPage").style.display = "none";
+
+    }
+
+});
+
 //loadFlats();
-loadLedger();
+//loadLedger();
 </script></body></html>
