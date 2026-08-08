@@ -1,176 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Building Maintenance Ledger</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+    --primary:#1f5eff;
+    --primary-dark:#1748c7;
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --text:#172033;
+    --muted:#667085;
+    --border:#d9e0ea;
+    --success:#16834b;
+    --danger:#c62828;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:17px;
+}
+
+button,input,select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+/* ---------- LOGIN ---------- */
+
+#loginPage{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:linear-gradient(135deg,#edf4ff,#f8fbff);
+}
+
+.login-card{
+    width:min(430px,100%);
+    background:white;
+    border-radius:22px;
+    padding:34px 28px;
+    box-shadow:0 12px 40px rgba(25,50,90,.12);
+    text-align:center;
+}
+
+.login-icon{
+    width:74px;
+    height:74px;
+    margin:0 auto 15px;
+    border-radius:20px;
+    background:#eaf1ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:38px;
+}
+
+.login-card h1{
+    margin:5px 0 8px;
+    font-size:28px;
+}
+
+.login-card p.subtitle{
+    color:var(--muted);
+    margin:0 0 25px;
+}
+
+.login-card input{
+    width:100%;
+    height:56px;
+    margin:7px 0;
+    padding:0 16px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    outline:none;
+}
+
+.login-card input:focus,
+.form-control:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(31,94,255,.12);
+}
+
+.login-button{
+    width:100%;
+    height:58px;
+    margin-top:12px;
+    border:0;
+    border-radius:13px;
+    background:var(--primary);
+    color:white;
+    font-weight:bold;
+    font-size:19px;
+}
+
+.login-button:hover{
+    background:var(--primary-dark);
+}
+
+#loginMessage{
+    min-height:24px;
+    margin-top:15px;
+    font-size:15px;
+}
+
+/* ---------- APP ---------- */
+
+#ledgerPage{
+    max-width:1180px;
+    margin:auto;
+    padding:18px;
+}
+
+.app-header{
+    background:var(--card);
+    border-radius:18px;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    box-shadow:0 4px 18px rgba(25,50,90,.07);
+    margin-bottom:18px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.brand-icon{
+    width:50px;
+    height:50px;
+    border-radius:14px;
+    background:#eaf1ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:27px;
+}
+
+.brand h2{
+    margin:0;
+    font-size:22px;
+}
+
+.brand small{
+    color:var(--muted);
+}
+
+.logout-btn{
+    border:1px solid var(--border);
+    background:white;
+    border-radius:11px;
+    padding:12px 17px;
+    font-weight:bold;
+}
+
+/* ---------- DASHBOARD ---------- */
+
+.dashboard{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:18px;
+}
+
+.stat-card{
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 4px 18px rgba(25,50,90,.06);
+}
+
+.stat-label{
+    color:var(--muted);
+    font-size:14px;
+}
+
+.stat-value{
+    margin-top:8px;
+    font-size:26px;
+    font-weight:bold;
+}
+
+/* ---------- ACTIONS ---------- */
+
+.actions{
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.action-btn{
+    min-height:58px;
+    border:0;
+    border-radius:14px;
+    font-weight:bold;
+    font-size:17px;
+    padding:12px 16px;
+}
+
+.add-main{
+    background:var(--primary);
+    color:white;
+    font-size:20px;
+}
+
+.add-main:hover{
+    background:var(--primary-dark);
+}
+
+.secondary{
+    background:white;
+    border:1px solid var(--border);
+    color:var(--text);
+}
+
+/* ---------- FORM ---------- */
+
+.form-card{
+    background:white;
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 4px 18px rgba(25,50,90,.06);
+    margin-bottom:18px;
+}
+
+.form-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+}
+
+.form-title h3{
+    margin:0;
+    font-size:21px;
+}
+
+.close-form{
+    border:0;
+    background:#f0f2f5;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    font-size:22px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.form-group label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:7px;
+}
+
+.form-control{
+    width:100%;
+    min-height:54px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 13px;
+    background:white;
+}
+
+.readonly{
+    background:#f5f7fa;
+    font-weight:bold;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+.save-btn{
+    width:100%;
+    min-height:58px;
+    border:0;
+    border-radius:13px;
+    background:var(--success);
+    color:white;
+    font-size:19px;
+    font-weight:bold;
+    margin-top:18px;
+}
+
+/* ---------- FILTER ---------- */
+
+.filter-card{
+    background:white;
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 4px 18px rgba(25,50,90,.06);
+    margin-bottom:18px;
+}
+
+.filter-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:12px;
+    align-items:end;
+}
+
+.filter-group label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:7px;
+}
+
+.clear-btn{
+    min-height:54px;
+    padding:0 18px;
+    border:1px solid var(--border);
+    background:white;
+    border-radius:12px;
+    font-weight:bold;
+}
+
+/* ---------- TABLE ---------- */
+
+.table-card{
+    background:white;
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 4px 18px rgba(25,50,90,.06);
+    overflow:hidden;
+}
+
+.table-scroll{
+    overflow-x:auto;
+}
+
+table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:950px;
+}
+
+th,td{
+    border-bottom:1px solid #e8edf3;
+    padding:12px 10px;
+    text-align:left;
+    white-space:nowrap;
+}
+
+th{
+    background:#f6f8fb;
+    font-size:14px;
+}
+
+td{
+    font-size:15px;
+}
+
+.amount-positive{
+    color:var(--success);
+    font-weight:bold;
+}
+
+.amount-outstanding{
+    color:var(--danger);
+    font-weight:bold;
+}
+
+/* ---------- MOBILE / ELDER FRIENDLY ---------- */
+
+@media(max-width:700px){
+
+    body{
+        font-size:18px;
+    }
+
+    #ledgerPage{
+        padding:10px;
+    }
+
+    .app-header{
+        padding:15px;
+    }
+
+    .brand h2{
+        font-size:19px;
+    }
+
+    .dashboard{
+        grid-template-columns:1fr;
+    }
+
+    .stat-value{
+        font-size:27px;
+    }
+
+    .actions{
+        grid-template-columns:1fr;
+    }
+
+    .action-btn{
+        min-height:62px;
+        font-size:18px;
+    }
+
+    .add-main{
+        font-size:20px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-card{
+        padding:18px 14px;
+    }
+
+    .form-control{
+        min-height:58px;
+        font-size:18px;
+    }
+
+    .filter-grid{
+        grid-template-columns:1fr;
+    }
+
+    .clear-btn{
+        width:100%;
+    }
+
+    .logout-btn{
+        padding:11px 12px;
+    }
+}
+
+/* Floating elder-friendly add button */
+.floating-add{
+    display:none;
+}
+
+@media(max-width:700px){
+    .floating-add{
+        display:block;
+        position:fixed;
+        right:18px;
+        bottom:18px;
+        z-index:100;
+        border:0;
+        border-radius:50px;
+        background:var(--primary);
+        color:white;
+        padding:16px 21px;
+        font-weight:bold;
+        font-size:17px;
+        box-shadow:0 7px 22px rgba(31,94,255,.35);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+
+<div id="loginPage">
+    <div class="login-card">
+        <div class="login-icon">🏢</div>
+        <h1>Building Maintenance</h1>
+        <p class="subtitle">Simple • Transparent • Accountable</p>
+
+        <input id="loginEmail"
+               type="email"
+               placeholder="Email address">
+
+        <input id="loginPassword"
+               type="password"
+               placeholder="Password">
+
+        <button class="login-button" onclick="login()">
+            Login
+        </button>
+
+        <p id="loginMessage"></p>
+    </div>
+</div>
 
 
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Building Maintenance Ledger</title><style>body{font-family:Arial;margin:20px;max-width:900px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}input{width:100%}</style></head><body><div id="loginPage">  <h2>Building Maintenance Login</h2>  
+<!-- ================= APPLICATION ================= -->
 
-<input id="loginEmail"  
-       type="email"  
-       placeholder="Email">  
+<div id="ledgerPage" style="display:none;">
 
-<input id="loginPassword"  
-       type="password"  
-       placeholder="Password">  
+    <header class="app-header">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <h2>Building Maintenance</h2>
+                <small>Maintenance Ledger</small>
+            </div>
+        </div>
 
-<button onclick="login()">Login</button>  
-
-<p id="loginMessage"></p>
-
-</div>  <div id="ledgerPage" style="display:none;">  <button onclick="logout()">Logout</button>
-<br><br>
-
-  <table>  <tr>  
-    <td>Owner</td>  
-    <td>  
-        <select id="owner">  
-            <option value="">-- Select Owner --</option>  
-            
-            <option value="Arpita Chakraborty">Arpita Chakraborty</option>  <option value="Chandan Kumar">Chandan Kumar</option>  
-          
-         
-        <option value="Sanjay Chanda">Sanjay Chanda</option>  
-        
-        <option value="Gita Ganguly">Gita Ganguly</option>  
-        <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>  
-         
-        <option value="Argha Ghosh">Argha Ghosh</option>  
-        <option value="Bhola">Bhola</option>  
-          
-        <option value="Krishna Halder">Krishna Halder</option>  
-        <option value="Anil Rudra">Anil Rudra</option>  
-        <option value="Srijani Nandi">Srijani Nandi</option>  
-    </select>  
-    
-    
-    
-    
-</td>
-
-</tr>  
-<tr>  
-    <td>Maintenance Month</td>  
-    <td>  
-        <input id="maintenanceMonth" type="month">  
-    </td>  
-</tr>  <tr>  
-    <td>Date</td>  
-    <td>  
-        <input id="date" type="date">  
-    </td>  
-</tr>  
-<tr>  
-    <td>Flat</td>  
-    <td>  
-        <select id="flat" onchange="flatSelected()">  <option value="">-- Select flat--</option>
-
- <option value="GF1">GF1</option>  
- <option value="GF2">GF2</option>  
- <option value="GF3">GF3</option>  <option value="1stFloor 1">1stFloor 1</option>  
- <option value="1stFloor 2">1stFloor 2</option>   <option value="2ndFloor 1">2ndFloor 1</option>  
-<option value="2ndFloor 2">2ndFloor 2</option>  
-<option value="2ndFloor 3">2ndFloor 3</option>  
-<option value="2ndFloor 4">2ndFloor 4</option>  <option value="3rdFloor 1">3rdFloor 1</option>  
-<option value="3rdFloor 2">3rdFloor 2</option>  
-<option value="3rdFloor 3">3rdFloor 3</option>  
-        </select>  
-    </td>  
-</tr>  <tr>  
-    <td>Type</td>  
-    <td>  
-        <select id="type">  
-            <option>Maintenance Received</option>  
-            <option>Building Expense</option>  </select>  
-</td>
-
-</tr>  
-<tr>  
-    <td>Maintenance to be Paid</td>  
-    <td>  
-        <input id="maintenanceDue" type="number" readonly>  
-    </td>  
-</tr>  <tr>  
-    <td>Actually Paid</td>  
-    <td>  
-        <input id="amount"  
-               type="number"  
-               placeholder="Enter amount actually paid"  
-               oninput="calculateCurrentBalance()">  
-    </td>  
-</tr>  <tr>  
-    <td>Previous Outstanding</td>  
-    <td>  
-        <input id="previousBalance" type="number" readonly>  
-    </td>  
-</tr>  <tr>  
-    <td>Current Outstanding</td>  
-    <td>  
-        <input id="balance" type="number" readonly>  
-    </td>  
-</tr>  <tr>  
-    <td>Remarks</td>  
-    <td>  
-        <input id="remarks">  
-    </td>  
-</tr>  
-</table><button onclick="add()">Add Entry</button>
-<button onclick="download()">Export CSV</button>
-<button onclick="recalculateLedger()">Recalculate Ledger</button>
+        <button class="logout-btn" onclick="logout()">
+            ↪ Logout
+        </button>
+    </header>
 
 
-<div style="margin:15px 0;">
+    <!-- Dashboard cards -->
+    <section class="dashboard">
 
-    <label>
-        <strong>Filter Owner:</strong>
-    </label>
+        <div class="stat-card">
+            <div class="stat-label">Total Maintenance Due</div>
+            <div class="stat-value" id="dashboardDue">₹0</div>
+        </div>
 
-    <select id="filterOwner" onchange="filterLedger()">
-        <option value="">All Owners</option>
+        <div class="stat-card">
+            <div class="stat-label">Total Received</div>
+            <div class="stat-value" id="dashboardPaid">₹0</div>
+        </div>
 
-        <option value="Arpita Chakraborty">Arpita Chakraborty</option>
-        <option value="Chandan Kumar">Chandan Kumar</option>
-        <option value="Sanjay Chanda">Sanjay Chanda</option>
-        <option value="Gita Ganguly">Gita Ganguly</option>
-        <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
-        <option value="Argha Ghosh">Argha Ghosh</option>
-        <option value="Bhola">Bhola</option>
-        <option value="Krishna Halder">Krishna Halder</option>
-        <option value="Anil Rudra">Anil Rudra</option>
-        <option value="Srijani Nandi">Srijani Nandi</option>
+        <div class="stat-card">
+            <div class="stat-label">Outstanding</div>
+            <div class="stat-value" id="dashboardBalance">₹0</div>
+        </div>
 
-    </select>
+    </section>
 
 
-    <label style="margin-left:15px;">
-        <strong>Filter Year:</strong>
-    </label>
+    <!-- Main actions -->
+    <section class="actions">
 
-    <select id="filterYear" onchange="filterLedger()">
-        <option value="">All Years</option>
-    </select>
+        <button class="action-btn add-main"
+                onclick="showEntryForm()">
+            ＋ Add Maintenance Payment
+        </button>
+
+        <button class="action-btn secondary"
+                onclick="download()">
+            ⬇ Export CSV
+        </button>
+
+        <button class="action-btn secondary"
+                onclick="recalculateLedger()">
+            ↻ Recalculate
+        </button>
+
+    </section>
 
 
-    <button onclick="clearFilters()">
-        Clear Filters
-    </button>
+    <!-- Entry form -->
+    <section id="entryForm" class="form-card" style="display:none;">
+
+        <div class="form-title">
+            <h3>＋ Add Maintenance Payment</h3>
+
+            <button class="close-form"
+                    onclick="hideEntryForm()">
+                ×
+            </button>
+        </div>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Owner</label>
+
+                <select id="owner" class="form-control">
+                    <option value="">Select Owner</option>
+                    <option value="Arpita Chakraborty">Arpita Chakraborty</option>
+                    <option value="Chandan Kumar">Chandan Kumar</option>
+                    <option value="Sanjay Chanda">Sanjay Chanda</option>
+                    <option value="Gita Ganguly">Gita Ganguly</option>
+                    <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
+                    <option value="Argha Ghosh">Argha Ghosh</option>
+                    <option value="Bhola">Bhola</option>
+                    <option value="Krishna Halder">Krishna Halder</option>
+                    <option value="Anil Rudra">Anil Rudra</option>
+                    <option value="Srijani Nandi">Srijani Nandi</option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label>Maintenance Month</label>
+
+                <input id="maintenanceMonth"
+                       class="form-control"
+                       type="month">
+            </div>
+
+
+            <div class="form-group">
+                <label>Payment Date</label>
+
+                <input id="date"
+                       class="form-control"
+                       type="date">
+            </div>
+
+
+            <div class="form-group">
+                <label>Flat</label>
+
+                <select id="flat"
+                        class="form-control"
+                        onchange="flatSelected()">
+
+                    <option value="">Select Flat</option>
+
+                    <option value="GF1">GF1</option>
+                    <option value="GF2">GF2</option>
+                    <option value="GF3">GF3</option>
+
+                    <option value="1stFloor 1">1st Floor 1</option>
+                    <option value="1stFloor 2">1st Floor 2</option>
+
+                    <option value="2ndFloor 1">2nd Floor 1</option>
+                    <option value="2ndFloor 2">2nd Floor 2</option>
+                    <option value="2ndFloor 3">2nd Floor 3</option>
+                    <option value="2ndFloor 4">2nd Floor 4</option>
+
+                    <option value="3rdFloor 1">3rd Floor 1</option>
+                    <option value="3rdFloor 2">3rd Floor 2</option>
+                    <option value="3rdFloor 3">3rd Floor 3</option>
+
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label>Type</label>
+
+                <select id="type" class="form-control">
+                    <option>Maintenance Received</option>
+                    <option>Building Expense</option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label>Maintenance Due</label>
+
+                <input id="maintenanceDue"
+                       class="form-control readonly"
+                       type="number"
+                       readonly>
+            </div>
+
+
+            <div class="form-group">
+                <label>Actually Paid</label>
+
+                <input id="amount"
+                       class="form-control"
+                       type="number"
+                       inputmode="decimal"
+                       placeholder="Enter amount"
+                       oninput="calculateCurrentBalance()">
+            </div>
+
+
+            <div class="form-group">
+                <label>Previous Outstanding</label>
+
+                <input id="previousBalance"
+                       class="form-control readonly"
+                       type="number"
+                       readonly>
+            </div>
+
+
+            <div class="form-group">
+                <label>Current Outstanding</label>
+
+                <input id="balance"
+                       class="form-control readonly"
+                       type="number"
+                       readonly>
+            </div>
+
+
+            <div class="form-group full">
+                <label>Remarks</label>
+
+                <input id="remarks"
+                       class="form-control"
+                       placeholder="Optional">
+            </div>
+
+        </div>
+
+        <button class="save-btn" onclick="add()">
+            ✓ SAVE PAYMENT
+        </button>
+
+    </section>
+
+
+    <!-- Filters -->
+    <section class="filter-card">
+
+        <div class="filter-grid">
+
+            <div class="filter-group">
+                <label>Filter by Owner</label>
+
+                <select id="filterOwner"
+                        class="form-control"
+                        onchange="filterLedger()">
+
+                    <option value="">All Owners</option>
+
+                    <option value="Arpita Chakraborty">Arpita Chakraborty</option>
+                    <option value="Chandan Kumar">Chandan Kumar</option>
+                    <option value="Sanjay Chanda">Sanjay Chanda</option>
+                    <option value="Gita Ganguly">Gita Ganguly</option>
+                    <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
+                    <option value="Argha Ghosh">Argha Ghosh</option>
+                    <option value="Bhola">Bhola</option>
+                    <option value="Krishna Halder">Krishna Halder</option>
+                    <option value="Anil Rudra">Anil Rudra</option>
+                    <option value="Srijani Nandi">Srijani Nandi</option>
+
+                </select>
+            </div>
+
+
+            <div class="filter-group">
+                <label>Filter by Year</label>
+
+                <select id="filterYear"
+                        class="form-control"
+                        onchange="filterLedger()">
+
+                    <option value="">All Years</option>
+
+                </select>
+            </div>
+
+
+            <button class="clear-btn"
+                    onclick="clearFilters()">
+                Clear Filters
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- Ledger -->
+    <section class="table-card">
+
+        <div class="table-scroll">
+
+            <table id="tbl">
+
+                <thead>
+                    <tr>
+                        <th>Owner</th>
+                        <th>Maintenance Month</th>
+                        <th>Date</th>
+                        <th>Flat</th>
+                        <th>Type</th>
+                        <th>Maintenance Due</th>
+                        <th>Actually Paid</th>
+                        <th>Previous Outstanding</th>
+                        <th>Current Outstanding</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
 
 </div>
-<table id="tbl">  
-<thead>  
-<tr>  
-  <th>Owner</th>  
-  <th>Maintenance Month</th>  
-  <th>Date</th>  
-  <th>Flat</th>  
-<th>Type</th>  
-<th>Maintenance Due</th>  
-<th>Actually Paid</th>  
-<th>Previous Outstanding</th>  
-<th>Current Outstanding</th>  
-<th>Remarks</th>  
-</tr>  
-</thead>  
-<tbody></tbody>  
-</table><script type="module">  //firebase initialization
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+<!-- Mobile floating button -->
+<button class="floating-add"
+        onclick="showEntryForm()">
+    ＋ Add Payment
+</button>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
     getFirestore,
@@ -179,145 +815,202 @@ import {
     getDocs,
     updateDoc,
     doc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
 import {
-getAuth,
-signInWithEmailAndPassword,
-signOut,
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+    getAuth,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+/* ================= FIREBASE ================= */
 
 const firebaseConfig = {
-apiKey: "AIzaSyBTvD-JiSK6NniNJQrpmecTQk_qbOx3AQk",
-authDomain: "shivam-maintenance.firebaseapp.com",
-projectId: "shivam-maintenance",
-storageBucket: "shivam-maintenance.firebasestorage.app",
-messagingSenderId: "462528226683",
-appId: "1:462528226683:web:0acf5da15565a8c8b809de",
-measurementId: "G-M6PJQB5D1Q"
+    apiKey: "AIzaSyBTvD-JiSK6NniNJQrpmecTQk_qbOx3AQk",
+    authDomain: "shivam-maintenance.firebaseapp.com",
+    projectId: "shivam-maintenance",
+    storageBucket: "shivam-maintenance.firebasestorage.app",
+    messagingSenderId: "462528226683",
+    appId: "1:462528226683:web:0acf5da15565a8c8b809de",
+    measurementId: "G-M6PJQB5D1Q"
 };
 
-// Connect to Firebase
 const app = initializeApp(firebaseConfig);
-
-// Connect to Firestore
 const db = getFirestore(app);
-//Connect to Firebase authentication
 const auth = getAuth(app);
-// Monthly maintenance amount for each flat
-// CHANGE THESE AMOUNTS TO YOUR ACTUAL AMOUNTS
+
+
+/* ================= MAINTENANCE RATES ================= */
 
 const maintenanceRates = {
 
-"GF1": 310,  
-"GF2": 250,  
-"GF3": 250,  
+    "GF1": 310,
+    "GF2": 250,
+    "GF3": 250,
 
-"1stFloor 1": 500,  
-"1stFloor 2": 500,  
+    "1stFloor 1": 500,
+    "1stFloor 2": 500,
 
-"2ndFloor 1": 295,  
-"2ndFloor 2": 275,  
-"2ndFloor 3": 300,  
-"2ndFloor 4": 260,  
+    "2ndFloor 1": 295,
+    "2ndFloor 2": 275,
+    "2ndFloor 3": 300,
+    "2ndFloor 4": 260,
 
-"3rdFloor 1": 495,  
-"3rdFloor 2": 500,  
-"3rdFloor 3": 500
-
+    "3rdFloor 1": 495,
+    "3rdFloor 2": 500,
+    "3rdFloor 3": 500
 };
 
-// STEP 9:
-// Maintenance calculation starts from January
-// of the current calendar year automatically.
+
+/*
+ * Current-year starting point.
+ *
+ * We are NOT changing your accounting logic here.
+ * Historical-year logic can be changed separately later.
+ */
 
 const currentYear = new Date().getFullYear();
 
 const maintenanceStartMonth =
     currentYear + "-01";
 
-async function login() {
 
-const email = document.getElementById("loginEmail").value.trim();  
-const password = document.getElementById("loginPassword").value;  
-const message = document.getElementById("loginMessage");  
+/* ================= UI ================= */
 
-message.textContent = "Logging in...";  
+function showEntryForm(){
 
-if (!email || !password) {  
-    message.textContent = "Please enter email and password.";  
-    return;  
-}  
+    document.getElementById("entryForm").style.display = "block";
 
-try {  
-
-    const userCredential = await signInWithEmailAndPassword(  
-        auth,  
-        email,  
-        password  
-    );  
-
-    console.log("Login successful:", userCredential.user.email);  
-
-    message.textContent = "Login successful!";  
-
-    document.getElementById("loginPage").style.display = "none";  
-    document.getElementById("ledgerPage").style.display = "block";  
-
-    await loadLedger();  
-
-} catch (error) {  
-
-    console.error("LOGIN ERROR:", error);  
-
-    message.textContent =  
-        error.code + " : " + error.message;  
+    document.getElementById("entryForm")
+        .scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
 }
 
+function hideEntryForm(){
+
+    document.getElementById("entryForm").style.display = "none";
 }
 
-async function logout() {
 
-try {  
+/* ================= LOGIN ================= */
 
-    await signOut(auth);  
+async function login(){
 
-    document.getElementById("ledgerPage").style.display = "none";  
-    document.getElementById("loginPage").style.display = "block";  
+    const email =
+        document.getElementById("loginEmail").value.trim();
 
-    document.getElementById("loginEmail").value = "";  
-    document.getElementById("loginPassword").value = "";  
-    document.getElementById("loginMessage").textContent = "";  
+    const password =
+        document.getElementById("loginPassword").value;
 
-} catch (error) {  
+    const message =
+        document.getElementById("loginMessage");
 
-    console.error(error);  
-    alert("Logout failed.");  
+    message.textContent = "Logging in...";
 
+    if(!email || !password){
+
+        message.textContent =
+            "Please enter email and password.";
+
+        return;
+    }
+
+    try{
+
+        const userCredential =
+            await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+
+        console.log(
+            "Login successful:",
+            userCredential.user.email
+        );
+
+        message.textContent =
+            "Login successful!";
+
+        document.getElementById("loginPage")
+            .style.display = "none";
+
+        document.getElementById("ledgerPage")
+            .style.display = "block";
+
+        await loadLedger();
+
+    }catch(error){
+
+        console.error("LOGIN ERROR:",error);
+
+        message.textContent =
+            error.code + " : " + error.message;
+    }
 }
 
+
+async function logout(){
+
+    try{
+
+        await signOut(auth);
+
+        document.getElementById("ledgerPage")
+            .style.display = "none";
+
+        document.getElementById("loginPage")
+            .style.display = "flex";
+
+        document.getElementById("loginEmail").value = "";
+        document.getElementById("loginPassword").value = "";
+        document.getElementById("loginMessage").textContent = "";
+
+        hideEntryForm();
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("Logout failed.");
+    }
 }
 
-function flatSelected() {
 
-const flat = document.getElementById("flat").value;  
+/* ================= FLAT ================= */
 
-if (!flat) {  
-    document.getElementById("maintenanceDue").value = "";  
-    document.getElementById("previousBalance").value = "";  
-    document.getElementById("balance").value = "";  
-    return;  
-}  
+function flatSelected(){
 
-const due = maintenanceRates[flat] || 0;  
+    const flat =
+        document.getElementById("flat").value;
 
-document.getElementById("maintenanceDue").value = due;  
+    if(!flat){
 
-calculatePreviousBalance();
+        document.getElementById("maintenanceDue").value = "";
+        document.getElementById("previousBalance").value = "";
+        document.getElementById("balance").value = "";
 
+        return;
+    }
+
+    const due =
+        maintenanceRates[flat] || 0;
+
+    document.getElementById("maintenanceDue").value = due;
+
+    calculatePreviousBalance();
 }
 
-async function calculatePreviousBalance() {
+
+/* ================= PREVIOUS BALANCE ================= */
+
+async function calculatePreviousBalance(){
 
     const owner =
         document.getElementById("owner").value;
@@ -328,8 +1021,7 @@ async function calculatePreviousBalance() {
     const maintenanceMonth =
         document.getElementById("maintenanceMonth").value;
 
-
-    if (!owner || !flat || !maintenanceMonth) {
+    if(!owner || !flat || !maintenanceMonth){
 
         document.getElementById("previousBalance").value = "";
         document.getElementById("balance").value = "";
@@ -337,121 +1029,61 @@ async function calculatePreviousBalance() {
         return;
     }
 
+    try{
 
-    try {
-
-        const [year, month] =
-            maintenanceMonth
-                .split("-")
-                .map(Number);
-
+        const [year,month] =
+            maintenanceMonth.split("-").map(Number);
 
         const monthlyDue =
             maintenanceRates[flat] || 0;
 
-
         const snapshot =
-            await getDocs(
-                collection(db, "ledger")
-            );
-
+            await getDocs(collection(db,"ledger"));
 
         const records = [];
 
+        snapshot.forEach((document)=>{
 
-        snapshot.forEach((document) => {
+            const row = document.data();
 
-            const row =
-                document.data();
-
-
-            if (
+            if(
                 row.owner === owner &&
                 row.flat === flat &&
                 row.type === "Maintenance Received" &&
                 row.maintenanceMonth
-            ) {
+            ){
 
                 records.push(row);
-
             }
-
         });
 
-
-        /*
-         * Find the first recorded year.
-         */
-
-        /*
- * STEP 9:
- * Maintenance calculation starts from
- * January of the current year.
- */
-
-const [startYear, startMonth] =
-    maintenanceStartMonth
-        .split("-")
-        .map(Number);
-
-
-        /*
-         * Number of months before
-         * the selected month.
-         */
+        const [startYear,startMonth] =
+            maintenanceStartMonth.split("-").map(Number);
 
         const monthsBeforeCurrent =
-    (
-        (year - startYear) * 12
-    ) +
-    (month - startMonth);
-
-
-        /*
-         * Maintenance due before
-         * the selected month.
-         */
+            ((year-startYear)*12) +
+            (month-startMonth);
 
         const totalDueBeforeCurrent =
             monthlyDue *
-            Math.max(
-                monthsBeforeCurrent,
-                0
-            );
-
-
-        /*
-         * Calculate all payments
-         * before the selected month.
-         */
+            Math.max(monthsBeforeCurrent,0);
 
         let totalPaidBeforeCurrentMonth = 0;
 
+        records.forEach((row)=>{
 
-        records.forEach((row) => {
+            const [rowYear,rowMonth] =
+                row.maintenanceMonth.split("-").map(Number);
 
-            const [rowYear, rowMonth] =
-                row.maintenanceMonth
-                    .split("-")
-                    .map(Number);
+            const rowPeriod =
+                ((rowYear-startYear)*12) +
+                (rowMonth-startMonth);
 
+            const currentPeriod =
+                ((year-startYear)*12) +
+                (month-startMonth);
 
-const rowPeriod =
-    (
-        (rowYear - startYear) * 12
-    ) +
-    (rowMonth - startMonth);
-
-
-const currentPeriod =
-    (
-        (year - startYear) * 12
-    ) +
-    (month - startMonth);
-                
-
-
-            if (rowPeriod < currentPeriod) {
+            if(rowPeriod < currentPeriod){
 
                 const paid =
                     Number(
@@ -460,50 +1092,27 @@ const currentPeriod =
                         0
                     );
 
-
-                totalPaidBeforeCurrentMonth +=
-                    paid;
-
+                totalPaidBeforeCurrentMonth += paid;
             }
-
         });
-
-
-        /*
-         * Previous Outstanding
-         */
 
         const previousBalance =
             totalDueBeforeCurrent -
             totalPaidBeforeCurrentMonth;
 
-
-        /*
-         * Current month's maintenance
-         */
-
         const currentBalanceBeforePayment =
             previousBalance +
             monthlyDue;
 
-
         document.getElementById("previousBalance").value =
             previousBalance;
-
 
         document.getElementById("balance").value =
             currentBalanceBeforePayment;
 
-
-        /*
-         * Recalculate after loading
-         * the previous balance.
-         */
-
         await calculateCurrentBalance();
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(
             "PREVIOUS BALANCE ERROR:",
@@ -514,20 +1123,26 @@ const currentPeriod =
             "Unable to calculate outstanding: " +
             error.message
         );
-
     }
-
 }
 
-// Recalculate when owner changes
+
 document.getElementById("owner")
-.addEventListener("change", calculatePreviousBalance);
+    .addEventListener(
+        "change",
+        calculatePreviousBalance
+    );
 
-// Recalculate when maintenance month changes
 document.getElementById("maintenanceMonth")
-.addEventListener("change", calculatePreviousBalance);
+    .addEventListener(
+        "change",
+        calculatePreviousBalance
+    );
 
-async function calculateCurrentBalance() {
+
+/* ================= CURRENT BALANCE ================= */
+
+async function calculateCurrentBalance(){
 
     const owner =
         document.getElementById("owner").value;
@@ -543,65 +1158,38 @@ async function calculateCurrentBalance() {
             document.getElementById("amount").value
         ) || 0;
 
-
-    if (!owner || !flat || !maintenanceMonth) {
+    if(!owner || !flat || !maintenanceMonth){
 
         document.getElementById("balance").value = "";
 
         return;
-
     }
 
-
-    try {
-
-        const [year, month] =
-            maintenanceMonth
-                .split("-")
-                .map(Number);
-
+    try{
 
         const monthlyDue =
             maintenanceRates[flat] || 0;
-
-
-        /*
-         * Previous Outstanding has already
-         * been calculated.
-         */
 
         const previousBalance =
             Number(
                 document.getElementById("previousBalance").value
             ) || 0;
 
-
-        /*
-         * Find payments already received
-         * for the selected maintenance month.
-         */
-
         const snapshot =
-            await getDocs(
-                collection(db, "ledger")
-            );
-
+            await getDocs(collection(db,"ledger"));
 
         let paidInCurrentMonth = 0;
 
+        snapshot.forEach((document)=>{
 
-        snapshot.forEach((document) => {
+            const row = document.data();
 
-            const row =
-                document.data();
-
-
-            if (
+            if(
                 row.owner === owner &&
                 row.flat === flat &&
                 row.type === "Maintenance Received" &&
                 row.maintenanceMonth === maintenanceMonth
-            ) {
+            ){
 
                 const paid =
                     Number(
@@ -610,23 +1198,9 @@ async function calculateCurrentBalance() {
                         0
                     );
 
-
-                paidInCurrentMonth +=
-                    paid;
-
+                paidInCurrentMonth += paid;
             }
-
         });
-
-
-        /*
-         * Current Outstanding =
-         *
-         * Previous Outstanding
-         * + Current Month Due
-         * - Existing Current Month Payments
-         * - New Payment
-         */
 
         const currentBalance =
             previousBalance +
@@ -634,189 +1208,118 @@ async function calculateCurrentBalance() {
             paidInCurrentMonth -
             paidNow;
 
-
         document.getElementById("balance").value =
             currentBalance;
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(
             "CURRENT BALANCE ERROR:",
             error
         );
-
     }
-
 }
 
-async function recalculateLedger() {
 
-    if (!confirm(
+/* ================= RECALCULATE ================= */
+
+async function recalculateLedger(){
+
+    if(!confirm(
         "This will recalculate Previous Outstanding and Current Outstanding for all maintenance records. Continue?"
-    )) {
+    )){
+
         return;
     }
 
-    try {
+    try{
 
         const snapshot =
-            await getDocs(
-                collection(db, "ledger")
-            );
-
-        /*
-         * Convert Firestore documents
-         * into an array.
-         */
+            await getDocs(collection(db,"ledger"));
 
         const records = [];
 
-        snapshot.forEach((document) => {
+        snapshot.forEach((document)=>{
 
             records.push({
-                id: document.id,
-                data: document.data()
+                id:document.id,
+                data:document.data()
             });
-
         });
 
         /*
-         * Maintenance calculation starts
-         * from January 2026.
+         * Current implementation remains exactly
+         * based on January of the current year.
          *
-         * IMPORTANT:
-         * Keep this fixed so that the calculation
-         * does not change automatically next year.
+         * Historical accounting can be added
+         * as the next step.
          */
 
         const maintenanceStartMonth = "2026-01";
 
-        const [startYear, startMonth] =
-            maintenanceStartMonth
-                .split("-")
-                .map(Number);
+        const [startYear,startMonth] =
+            maintenanceStartMonth.split("-").map(Number);
 
-        /*
-         * Process every maintenance record.
-         */
+        for(const record of records){
 
-        for (const record of records) {
+            const row = record.data;
 
-            const row =
-                record.data;
-
-            /*
-             * Only Maintenance Received records
-             * participate in outstanding calculation.
-             */
-
-            if (
+            if(
                 row.type !== "Maintenance Received" ||
                 !row.owner ||
                 !row.flat ||
                 !row.maintenanceMonth
-            ) {
+            ){
+
                 continue;
             }
 
-            const [year, month] =
-                row.maintenanceMonth
-                    .split("-")
-                    .map(Number);
+            const [year,month] =
+                row.maintenanceMonth.split("-").map(Number);
 
             const monthlyDue =
                 maintenanceRates[row.flat] || 0;
 
-            /*
-             * Calculate the period number
-             * relative to January 2026.
-             *
-             * January 2026 = 0
-             * February 2026 = 1
-             * March 2026 = 2
-             * etc.
-             */
-
             const currentPeriod =
-                (
-                    (year - startYear) * 12
-                ) +
-                (month - startMonth);
+                ((year-startYear)*12) +
+                (month-startMonth);
 
-            /*
-             * If the record is before January 2026,
-             * do not calculate maintenance due for it.
-             */
+            if(currentPeriod < 0){
 
-            if (currentPeriod < 0) {
                 continue;
             }
-
-            /*
-             * Maintenance due BEFORE
-             * the current month.
-             *
-             * Example:
-             *
-             * August 2026
-             *
-             * Jan-Jul = 7 months
-             */
 
             const monthsBeforeCurrent =
                 currentPeriod;
 
             const totalDueBeforeCurrent =
                 monthlyDue *
-                Math.max(
-                    monthsBeforeCurrent,
-                    0
-                );
-
-            /*
-             * Calculate ALL payments made
-             * before the current month.
-             */
+                Math.max(monthsBeforeCurrent,0);
 
             let totalPaidBeforeCurrentMonth = 0;
 
-            records.forEach((otherRecord) => {
+            records.forEach((otherRecord)=>{
 
-                const other =
-                    otherRecord.data;
+                const other = otherRecord.data;
 
-                if (
+                if(
                     other.owner === row.owner &&
                     other.flat === row.flat &&
                     other.type === "Maintenance Received" &&
                     other.maintenanceMonth
-                ) {
+                ){
 
-                    const [otherYear, otherMonth] =
-                        other.maintenanceMonth
-                            .split("-")
-                            .map(Number);
+                    const [otherYear,otherMonth] =
+                        other.maintenanceMonth.split("-").map(Number);
 
                     const otherPeriod =
-                        (
-                            (otherYear - startYear) * 12
-                        ) +
-                        (otherMonth - startMonth);
+                        ((otherYear-startYear)*12) +
+                        (otherMonth-startMonth);
 
-                    /*
-                     * IMPORTANT:
-                     *
-                     * Ignore payments before January 2026.
-                     *
-                     * Count only payments strictly
-                     * before the current month.
-                     */
-
-                    if (
+                    if(
                         otherPeriod >= 0 &&
                         otherPeriod < currentPeriod
-                    ) {
+                    ){
 
                         const paid =
                             Number(
@@ -825,67 +1328,39 @@ async function recalculateLedger() {
                                 0
                             );
 
-                        totalPaidBeforeCurrentMonth +=
-                            paid;
+                        totalPaidBeforeCurrentMonth += paid;
                     }
                 }
             });
-
-            /*
-             * PREVIOUS OUTSTANDING
-             *
-             * Maintenance due before current month
-             * minus
-             * payments before current month.
-             */
 
             const previousBalance =
                 totalDueBeforeCurrent -
                 totalPaidBeforeCurrentMonth;
 
-            /*
-             * Calculate ALL payments received
-             * up to and including current month.
-             */
-
             let totalPaidUpToCurrentMonth = 0;
 
-            records.forEach((otherRecord) => {
+            records.forEach((otherRecord)=>{
 
-                const other =
-                    otherRecord.data;
+                const other = otherRecord.data;
 
-                if (
+                if(
                     other.owner === row.owner &&
                     other.flat === row.flat &&
                     other.type === "Maintenance Received" &&
                     other.maintenanceMonth
-                ) {
+                ){
 
-                    const [otherYear, otherMonth] =
-                        other.maintenanceMonth
-                            .split("-")
-                            .map(Number);
+                    const [otherYear,otherMonth] =
+                        other.maintenanceMonth.split("-").map(Number);
 
                     const otherPeriod =
-                        (
-                            (otherYear - startYear) * 12
-                        ) +
-                        (otherMonth - startMonth);
+                        ((otherYear-startYear)*12) +
+                        (otherMonth-startMonth);
 
-                    /*
-                     * IMPORTANT:
-                     *
-                     * Ignore payments before January 2026.
-                     *
-                     * Include payments from January 2026
-                     * through the current month.
-                     */
-
-                    if (
+                    if(
                         otherPeriod >= 0 &&
                         otherPeriod <= currentPeriod
-                    ) {
+                    ){
 
                         const paid =
                             Number(
@@ -894,67 +1369,34 @@ async function recalculateLedger() {
                                 0
                             );
 
-                        totalPaidUpToCurrentMonth +=
-                            paid;
+                        totalPaidUpToCurrentMonth += paid;
                     }
                 }
             });
-
-            /*
-             * Total maintenance due INCLUDING
-             * the current month.
-             */
 
             const totalDueThroughCurrent =
                 totalDueBeforeCurrent +
                 monthlyDue;
 
-            /*
-             * CURRENT OUTSTANDING
-             *
-             * Total due through current month
-             * minus
-             * all payments through current month.
-             */
-
             const currentBalance =
                 totalDueThroughCurrent -
                 totalPaidUpToCurrentMonth;
 
-            /*
-             * Update Firestore.
-             */
-
             await updateDoc(
-                doc(
-                    db,
-                    "ledger",
-                    record.id
-                ),
+                doc(db,"ledger",record.id),
                 {
-                    maintenanceDue:
-                        monthlyDue,
-
-                    previousBalance:
-                        previousBalance,
-
-                    balance:
-                        currentBalance
+                    maintenanceDue:monthlyDue,
+                    previousBalance:previousBalance,
+                    balance:currentBalance
                 }
             );
         }
 
-        alert(
-            "Ledger recalculated successfully."
-        );
-
-        /*
-         * Reload the ledger after recalculation.
-         */
+        alert("Ledger recalculated successfully.");
 
         await loadLedger();
 
-    } catch (error) {
+    }catch(error){
 
         console.error(
             "RECALCULATE ERROR:",
@@ -968,7 +1410,10 @@ async function recalculateLedger() {
     }
 }
 
-async function add() {
+
+/* ================= ADD ================= */
+
+async function add(){
 
     const owner =
         document.getElementById("owner").value;
@@ -993,14 +1438,13 @@ async function add() {
     const remarks =
         document.getElementById("remarks").value;
 
-
-    if (
+    if(
         !owner ||
         !date ||
         !maintenanceMonth ||
         !flat ||
         !amount
-    ) {
+    ){
 
         alert(
             "Please select Owner, Maintenance Month, Date, Flat and enter Amount."
@@ -1008,44 +1452,30 @@ async function add() {
 
         return;
     }
-    /*
-     * STEP 8:
-     * Prevent duplicate maintenance entries
-     * for the same owner + flat + month.
-     */
 
-    try {
+    try{
 
         const existingSnapshot =
-            await getDocs(
-                collection(db, "ledger")
-            );
-
+            await getDocs(collection(db,"ledger"));
 
         let duplicateFound = false;
 
+        existingSnapshot.forEach((document)=>{
 
-        existingSnapshot.forEach((document) => {
+            const row = document.data();
 
-            const row =
-                document.data();
-
-
-            if (
+            if(
                 row.owner === owner &&
                 row.flat === flat &&
                 row.type === "Maintenance Received" &&
                 row.maintenanceMonth === maintenanceMonth
-            ) {
+            ){
 
                 duplicateFound = true;
-
             }
-
         });
 
-
-        if (duplicateFound) {
+        if(duplicateFound){
 
             const proceed =
                 confirm(
@@ -1056,16 +1486,13 @@ async function add() {
                     "Do you want to add another payment for the same month?"
                 );
 
-
-            if (!proceed) {
+            if(!proceed){
 
                 return;
-
             }
-
         }
 
-    } catch (error) {
+    }catch(error){
 
         console.error(
             "DUPLICATE CHECK ERROR:",
@@ -1078,131 +1505,60 @@ async function add() {
         );
 
         return;
-
     }
 
-    try {
+    try{
 
-        const [year, month] =
-            maintenanceMonth
-                .split("-")
-                .map(Number);
-
+        const [year,month] =
+            maintenanceMonth.split("-").map(Number);
 
         const monthlyDue =
             maintenanceRates[flat] || 0;
 
-
         let previousBalance = 0;
         let currentBalance = 0;
 
-
-        /*
-         * Only maintenance receipts affect
-         * the maintenance outstanding balance.
-         */
-
-        if (type === "Maintenance Received") {
+        if(type === "Maintenance Received"){
 
             const snapshot =
-                await getDocs(
-                    collection(db, "ledger")
-                );
+                await getDocs(collection(db,"ledger"));
 
-
-            /*
-             * Find the first recorded year
-             * for this owner + flat.
-             */
-
-            /*
- * STEP 9:
- * Maintenance calculation starts from
- * January of the current calendar year.
- */
-
-const [startYear, startMonth] =
-    maintenanceStartMonth
-        .split("-")
-        .map(Number);
-
-            /*
-             * Number of months before
-             * the selected maintenance month.
-             *
-             * Example:
-             *
-             * First year = 2025
-             * Selected = 2026-08
-             *
-             * Months before August 2026 =
-             * 19 months
-             */
+            const [startYear,startMonth] =
+                maintenanceStartMonth.split("-").map(Number);
 
             const monthsBeforeCurrent =
-    (
-        (year - startYear) * 12
-    ) +
-    (month - startMonth);
-
-
-            /*
-             * Total maintenance due
-             * before the selected month.
-             */
+                ((year-startYear)*12) +
+                (month-startMonth);
 
             const totalDueBeforeCurrent =
                 monthlyDue *
-                Math.max(
-                    monthsBeforeCurrent,
-                    0
-                );
-
-
-            /*
-             * Calculate ALL payments made
-             * before the selected month.
-             */
+                Math.max(monthsBeforeCurrent,0);
 
             let totalPaidBeforeCurrentMonth = 0;
 
+            snapshot.forEach((document)=>{
 
-            snapshot.forEach((document) => {
+                const row = document.data();
 
-                const row =
-                    document.data();
-
-
-                if (
+                if(
                     row.owner === owner &&
                     row.flat === flat &&
                     row.type === "Maintenance Received" &&
                     row.maintenanceMonth
-                ) {
+                ){
 
-                    const [rowYear, rowMonth] =
-                        row.maintenanceMonth
-                            .split("-")
-                            .map(Number);
-
+                    const [rowYear,rowMonth] =
+                        row.maintenanceMonth.split("-").map(Number);
 
                     const rowPeriod =
-    (
-        (rowYear - startYear) * 12
-    ) +
-    (rowMonth - startMonth);
+                        ((rowYear-startYear)*12) +
+                        (rowMonth-startMonth);
 
+                    const currentPeriod =
+                        ((year-startYear)*12) +
+                        (month-startMonth);
 
-const currentPeriod =
-    (
-        (year - startYear) * 12
-    ) +
-    (month - startMonth);
-
-
-                    if (
-                        rowPeriod < currentPeriod
-                    ) {
+                    if(rowPeriod < currentPeriod){
 
                         const paid =
                             Number(
@@ -1211,53 +1567,27 @@ const currentPeriod =
                                 0
                             );
 
-
-                        totalPaidBeforeCurrentMonth +=
-                            paid;
-
+                        totalPaidBeforeCurrentMonth += paid;
                     }
-
                 }
-
             });
-
-
-            /*
-             * PREVIOUS OUTSTANDING
-             *
-             * All maintenance due before
-             * current month
-             *
-             * minus
-             *
-             * all payments before current month.
-             */
 
             previousBalance =
                 totalDueBeforeCurrent -
                 totalPaidBeforeCurrentMonth;
 
-
-            /*
-             * Find payments already received
-             * for the CURRENT maintenance month.
-             */
-
             let paidInCurrentMonth = 0;
 
+            snapshot.forEach((document)=>{
 
-            snapshot.forEach((document) => {
+                const row = document.data();
 
-                const row =
-                    document.data();
-
-
-                if (
+                if(
                     row.owner === owner &&
                     row.flat === flat &&
                     row.type === "Maintenance Received" &&
                     row.maintenanceMonth === maintenanceMonth
-                ) {
+                ){
 
                     const paid =
                         Number(
@@ -1266,118 +1596,55 @@ const currentPeriod =
                             0
                         );
 
-
-                    paidInCurrentMonth +=
-                        paid;
-
+                    paidInCurrentMonth += paid;
                 }
-
             });
-
-
-            /*
-             * CURRENT OUTSTANDING
-             *
-             * Previous Outstanding
-             * + Current Month Maintenance
-             * - Existing Current Month Payments
-             * - New Payment
-             */
 
             currentBalance =
                 previousBalance +
                 monthlyDue -
                 paidInCurrentMonth -
                 amount;
-
         }
 
-
-        /*
-         * Save the new record.
-         */
-
         await addDoc(
-            collection(db, "ledger"),
+            collection(db,"ledger"),
             {
-
-                owner:
-                    owner,
-
-                maintenanceMonth:
-                    maintenanceMonth,
-
-                date:
-                    date,
-
-                flat:
-                    flat,
-
-                type:
-                    type,
-
-                amount:
-                    amount,
-
-                maintenanceDue:
-                    monthlyDue,
-
+                owner:owner,
+                maintenanceMonth:maintenanceMonth,
+                date:date,
+                flat:flat,
+                type:type,
+                amount:amount,
+                maintenanceDue:monthlyDue,
                 actuallyPaid:
                     type === "Maintenance Received"
                         ? amount
                         : 0,
-
-                previousBalance:
-                    previousBalance,
-
-                balance:
-                    currentBalance,
-
-                remarks:
-                    remarks,
-
-                createdAt:
-                    new Date()
+                previousBalance:previousBalance,
+                balance:currentBalance,
+                remarks:remarks,
+                createdAt:new Date()
             }
         );
 
-
-        alert(
-            "Entry added successfully."
-        );
-
-
-        /*
-         * Clear form.
-         */
+        alert("Entry added successfully.");
 
         document.getElementById("owner").value = "";
-
         document.getElementById("maintenanceMonth").value = "";
-
         document.getElementById("date").value = "";
-
         document.getElementById("flat").value = "";
-
         document.getElementById("amount").value = "";
-
         document.getElementById("maintenanceDue").value = "";
-
         document.getElementById("previousBalance").value = "";
-
         document.getElementById("balance").value = "";
-
         document.getElementById("remarks").value = "";
 
-
-        /*
-         * Refresh ledger.
-         */
+        hideEntryForm();
 
         await loadLedger();
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(
             "ADD ENTRY ERROR:",
@@ -1388,75 +1655,57 @@ const currentPeriod =
             "Failed to add entry: " +
             error.message
         );
-
     }
-
 }
 
-async function loadLedger() {
+
+/* ================= LOAD ================= */
+
+async function loadLedger(){
 
     const tbody =
         document.querySelector("#tbl tbody");
 
     tbody.innerHTML = "";
 
-    try {
+    try{
 
         const snapshot =
-            await getDocs(collection(db, "ledger"));
-
-
-        /*
-         * Store records so filterLedger()
-         * can use them without querying Firebase again.
-         */
+            await getDocs(collection(db,"ledger"));
 
         window.ledgerRecords = [];
 
-
-        snapshot.forEach((document) => {
+        snapshot.forEach((document)=>{
 
             window.ledgerRecords.push({
-                id: document.id,
-                data: document.data()
+                id:document.id,
+                data:document.data()
             });
-
         });
-
-
-        /*
-         * Populate Year filter
-         */
 
         const yearSelect =
             document.getElementById("filterYear");
 
         const years = new Set();
 
-
-        window.ledgerRecords.forEach((record) => {
+        window.ledgerRecords.forEach((record)=>{
 
             const row = record.data;
 
-            if (row.maintenanceMonth) {
+            if(row.maintenanceMonth){
 
-                const year =
-                    row.maintenanceMonth.substring(0, 4);
-
-                years.add(year);
-
+                years.add(
+                    row.maintenanceMonth.substring(0,4)
+                );
             }
-
         });
-
 
         yearSelect.innerHTML =
             '<option value="">All Years</option>';
 
-
         [...years]
             .sort()
-            .forEach((year) => {
+            .forEach((year)=>{
 
                 const option =
                     document.createElement("option");
@@ -1465,27 +1714,23 @@ async function loadLedger() {
                 option.textContent = year;
 
                 yearSelect.appendChild(option);
-
             });
 
-
-        /*
-         * Display all records
-         */
-
         displayLedger(window.ledgerRecords);
+        updateDashboard(window.ledgerRecords);
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
         alert(error.message);
-
     }
 }
 
-function filterLedger() {
+
+/* ================= FILTER ================= */
+
+function filterLedger(){
 
     const selectedOwner =
         document.getElementById("filterOwner").value;
@@ -1494,7 +1739,7 @@ function filterLedger() {
         document.getElementById("filterYear").value;
 
     const filteredRecords =
-        window.ledgerRecords.filter((record) => {
+        window.ledgerRecords.filter((record)=>{
 
             const row = record.data;
 
@@ -1510,44 +1755,51 @@ function filterLedger() {
                 );
 
             return ownerMatches && yearMatches;
-
         });
 
     displayLedger(filteredRecords);
+    updateDashboard(filteredRecords);
 }
 
-function displayLedger(records) {
+
+/* ================= DISPLAY ================= */
+
+function displayLedger(records){
 
     const tbody =
         document.querySelector("#tbl tbody");
 
     tbody.innerHTML = "";
 
-    if (!records || records.length === 0) {
+    if(!records || records.length === 0){
 
         const tr =
             document.createElement("tr");
 
-        tr.innerHTML = `
-            <td colspan="10" style="text-align:center;">
+        tr.innerHTML =
+            `<td colspan="10" style="text-align:center;padding:30px;">
                 No records found
-            </td>
-        `;
+            </td>`;
 
         tbody.appendChild(tr);
 
         return;
     }
 
+    records.forEach((record)=>{
 
-    records.forEach((record) => {
-
-        const row =
-            record.data;
+        const row = record.data;
 
         const tr =
             document.createElement("tr");
 
+        const balance =
+            Number(row.balance ?? 0);
+
+        const balanceClass =
+            balance > 0
+                ? "amount-outstanding"
+                : "amount-positive";
 
         tr.innerHTML = `
 
@@ -1562,106 +1814,114 @@ function displayLedger(records) {
 <td>${row.type ?? ""}</td>
 
 <td>
-    ${
-        row.type === "Maintenance Received"
+${
+    row.type === "Maintenance Received"
         ? "₹" + (row.maintenanceDue ?? 0)
         : ""
-    }
+}
 </td>
 
-<td>
-    ${
-        row.type === "Maintenance Received"
+<td class="amount-positive">
+${
+    row.type === "Maintenance Received"
         ? "₹" + (row.actuallyPaid ?? row.amount ?? 0)
         : ""
-    }
+}
 </td>
 
 <td>
-    ${
-        row.type === "Maintenance Received"
+${
+    row.type === "Maintenance Received"
         ? "₹" + (row.previousBalance ?? 0)
         : ""
-    }
+}
 </td>
 
-<td>
-    ${
-        row.type === "Maintenance Received"
-        ? "₹" + (row.balance ?? 0)
+<td class="${balanceClass}">
+${
+    row.type === "Maintenance Received"
+        ? "₹" + balance
         : ""
-    }
+}
 </td>
 
 <td>${row.remarks ?? ""}</td>
 
 `;
 
-
         tbody.appendChild(tr);
-
     });
-
 }
 
-function clearFilters() {
+
+/* ================= CLEAR FILTER ================= */
+
+function clearFilters(){
 
     document.getElementById("filterOwner").value = "";
-
     document.getElementById("filterYear").value = "";
 
     displayLedger(window.ledgerRecords);
-
+    updateDashboard(window.ledgerRecords);
 }
 
-/*async function loadFlats() {
-const select = document.getElementById("flat");
 
-select.innerHTML = '<option value="">Select Flat</option>';  
+/* ================= DASHBOARD ================= */
 
-const snapshot = await getDocs(collection(db, "flats"));  
+function updateDashboard(records){
 
-snapshot.forEach((doc) => {  
-    const flat = doc.data();  
+    let due = 0;
+    let paid = 0;
 
-    const option = document.createElement("option");  
-    option.value = flat.floor;  
-    option.textContent = flat.floor;  
+    (records || []).forEach((record)=>{
 
-    select.appendChild(option);  
-});
+        const row = record.data;
 
-}*/
+        if(row.type === "Maintenance Received"){
 
-async function download() {
+            due += Number(row.maintenanceDue ?? 0);
 
-    try {
+            paid += Number(
+                row.actuallyPaid ??
+                row.amount ??
+                0
+            );
+        }
+    });
 
-        /*
-         * Get current filter values
-         */
+    const balance = due - paid;
+
+    document.getElementById("dashboardDue").textContent =
+        "₹" + due.toLocaleString("en-IN");
+
+    document.getElementById("dashboardPaid").textContent =
+        "₹" + paid.toLocaleString("en-IN");
+
+    document.getElementById("dashboardBalance").textContent =
+        "₹" + balance.toLocaleString("en-IN");
+}
+
+
+/* ================= CSV EXPORT ================= */
+
+async function download(){
+
+    try{
+
         const selectedOwner =
             document.getElementById("filterOwner").value;
 
         const selectedYear =
             document.getElementById("filterYear").value;
 
-
-        /*
-         * Use the already-loaded ledger records.
-         * This means the CSV follows the filters
-         * currently selected on screen.
-         */
         const records =
-            (window.ledgerRecords || []).filter((record) => {
+            (window.ledgerRecords || []).filter((record)=>{
 
                 const row = record.data;
-
 
                 const ownerMatches =
                     !selectedOwner ||
                     row.owner === selectedOwner;
-
 
                 const yearMatches =
                     !selectedYear ||
@@ -1670,17 +1930,10 @@ async function download() {
                         row.maintenanceMonth.startsWith(selectedYear)
                     );
 
-
                 return ownerMatches && yearMatches;
-
             });
 
-
-        /*
-         * CSV headers
-         */
         const headers = [
-
             "Owner",
             "Maintenance Month",
             "Date",
@@ -1691,70 +1944,34 @@ async function download() {
             "Previous Outstanding",
             "Current Outstanding",
             "Remarks"
-
         ];
 
+        function csvField(value){
 
-        /*
-         * Make a value safe for CSV.
-         *
-         * Example:
-         * Soumen, ABC
-         *
-         * becomes:
-         * "Soumen, ABC"
-         *
-         * Quotes inside text are doubled.
-         */
-        function csvField(value) {
-
-            if (
-                value === null ||
-                value === undefined
-            ) {
+            if(value === null || value === undefined){
 
                 return '""';
-
             }
 
-
             return '"' +
-                String(value)
-                    .replace(/"/g, '""') +
+                String(value).replace(/"/g,'""') +
                 '"';
-
         }
 
-
-        /*
-         * Start CSV
-         */
         let csv =
-            headers
-                .map(csvField)
-                .join(",") +
+            headers.map(csvField).join(",") +
             "\n";
 
+        records.forEach((record)=>{
 
-        /*
-         * Add filtered records
-         */
-        records.forEach((record) => {
-
-            const row =
-                record.data;
-
+            const row = record.data;
 
             const data = [
 
                 row.owner || "",
-
                 row.maintenanceMonth || "",
-
                 row.date || "",
-
                 row.flat || "",
-
                 row.type || "",
 
                 row.type === "Maintenance Received"
@@ -1774,76 +1991,49 @@ async function download() {
                     : "",
 
                 row.remarks || ""
-
             ];
 
-
             csv +=
-                data
-                    .map(csvField)
-                    .join(",") +
+                data.map(csvField).join(",") +
                 "\n";
-
         });
 
-
-        /*
-         * UTF-8 BOM.
-         *
-         * This helps Excel correctly display
-         * characters such as ₹.
-         */
         const blob =
             new Blob(
                 ["\uFEFF" + csv],
                 {
-                    type: "text/csv;charset=utf-8;"
+                    type:"text/csv;charset=utf-8;"
                 }
             );
-
 
         const url =
             URL.createObjectURL(blob);
 
-
         const a =
             document.createElement("a");
 
-
         a.href = url;
 
-
-        /*
-         * Give the file a useful name
-         */
         let fileName =
             "Building_Maintenance_Ledger";
 
-
-        if (selectedOwner) {
+        if(selectedOwner){
 
             fileName +=
                 "_" +
-                selectedOwner
-                    .replace(/\s+/g, "_");
-
+                selectedOwner.replace(/\s+/g,"_");
         }
 
-
-        if (selectedYear) {
+        if(selectedYear){
 
             fileName +=
                 "_" +
                 selectedYear;
-
         }
-
 
         fileName += ".csv";
 
-
         a.download = fileName;
-
 
         document.body.appendChild(a);
 
@@ -1853,20 +2043,14 @@ async function download() {
 
         URL.revokeObjectURL(url);
 
-
-        /*
-         * Inform user if no records matched
-         */
-        if (records.length === 0) {
+        if(records.length === 0){
 
             alert(
                 "No records found for the selected filters."
             );
-
         }
 
-
-    } catch (error) {
+    }catch(error){
 
         console.error(
             "CSV EXPORT ERROR:",
@@ -1877,11 +2061,11 @@ async function download() {
             "Failed to export CSV: " +
             error.message
         );
-
     }
-
 }
 
+
+/* ================= GLOBAL FUNCTIONS ================= */
 
 window.login = login;
 window.logout = logout;
@@ -1894,27 +2078,36 @@ window.clearFilters = clearFilters;
 window.flatSelected = flatSelected;
 window.recalculateLedger = recalculateLedger;
 window.calculateCurrentBalance = calculateCurrentBalance;
-// Check whether the user is already logged in
-onAuthStateChanged(auth, (user) => {
 
-if (user) {  
+window.showEntryForm = showEntryForm;
+window.hideEntryForm = hideEntryForm;
 
-    // User is logged in  
-    document.getElementById("loginPage").style.display = "none";  
-    document.getElementById("ledgerPage").style.display = "block";  
 
-    loadLedger();  
+/* ================= AUTH STATE ================= */
 
-} else {  
+onAuthStateChanged(auth,(user)=>{
 
-    // User is not logged in  
-    document.getElementById("loginPage").style.display = "block";  
-    document.getElementById("ledgerPage").style.display = "none";  
+    if(user){
 
-}
+        document.getElementById("loginPage")
+            .style.display = "none";
 
+        document.getElementById("ledgerPage")
+            .style.display = "block";
+
+        loadLedger();
+
+    }else{
+
+        document.getElementById("loginPage")
+            .style.display = "flex";
+
+        document.getElementById("ledgerPage")
+            .style.display = "none";
+    }
 });
 
-//loadFlats();
-//loadLedger();
-</script></body></html>
+</script>
+
+</body>
+</html>
