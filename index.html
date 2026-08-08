@@ -31,28 +31,43 @@
     <td>
         <select id="owner">
             <option value="">-- Select Owner --</option>
+            //3rd Floor
             <option value="Arpita Chakraborty">Arpita Chakraborty</option>
+            
             <option value="Chandan Kumar">Chandan Kumar</option>
+            
+            //2nd Floor
             <option value="Sanjay Chanda">Sanjay Chanda</option>
+            //1st Floor
             <option value="Gita Ganguly">Gita Ganguly</option>
             <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
+            //GF
             <option value="Argha Ghosh">Argha Ghosh</option>
             <option value="Bhola">Bhola</option>
+            
             <option value="Krishna Halder">Krishna Halder</option>
             <option value="Anil Rudra">Anil Rudra</option>
-            <option value="Srijani Nandi">Srijani Nand</option>
+            <option value="Srijani Nandi">Srijani Nandi</option>
         </select>
     </td>
 </tr>
 <tr>
-<td>Date</td>
+    <td>Maintenance Month</td>
+    <td>
+        <input id="maintenanceMonth" type="month">
+    </td>
+</tr>
 
-<td><input id="date" type="date"></td>
+<tr>
+    <td>Date</td>
+    <td>
+        <input id="date" type="date">
+    </td>
 </tr>
 <tr>
     <td>Flat</td>
     <td>
-        <select id="flat">
+        <select id="flat" onchange="flatSelected()">
         
         <option value="">-- Select flat--</option>
  <option value="GF1">GF1</option>
@@ -65,6 +80,7 @@
  <option value="2ndFloor 1">2ndFloor 1</option>
 <option value="2ndFloor 2">2ndFloor 2</option>
 <option value="2ndFloor 3">2ndFloor 3</option>
+<option value="2ndFloor 4">2ndFloor 4</option>
 
 <option value="3rdFloor 1">3rdFloor 1</option>
 <option value="3rdFloor 2">3rdFloor 2</option>
@@ -84,21 +100,58 @@
     </td>
 </tr>
 <tr>
-  
-<td>Amount</td>
-<td><input id="amount" type="number"></td></tr>
-<tr><td>Remarks</td><td><input id="remarks"></td></tr></table><button onclick="add()">Add Entry</button>
+    <td>Maintenance to be Paid</td>
+    <td>
+        <input id="maintenanceDue" type="number" readonly>
+    </td>
+</tr>
+
+<tr>
+    <td>Actually Paid</td>
+    <td>
+        <input id="amount"
+               type="number"
+               placeholder="Enter amount actually paid"
+               oninput="calculateCurrentBalance()">
+    </td>
+</tr>
+
+<tr>
+    <td>Previous Outstanding</td>
+    <td>
+        <input id="previousBalance" type="number" readonly>
+    </td>
+</tr>
+
+<tr>
+    <td>Current Outstanding</td>
+    <td>
+        <input id="balance" type="number" readonly>
+    </td>
+</tr>
+
+<tr>
+    <td>Remarks</td>
+    <td>
+        <input id="remarks">
+    </td>
+</tr>
+</table><button onclick="add()">Add Entry</button>
 <button onclick="download()">Export CSV</button>
 
 <table id="tbl">
 <thead>
 <tr>
-    <th>Owner</th>
-    <th>Date</th>
-    <th>Flat</th>
-    <th>Type</th>
-    <th>Amount</th>
-    <th>Remarks</th>
+  <th>Owner</th>
+  <th>Maintenance Month</th>
+  <th>Date</th>
+  <th>Flat</th>
+<th>Type</th>
+<th>Maintenance Due</th>
+<th>Actually Paid</th>
+<th>Previous Outstanding</th>
+<th>Current Outstanding</th>
+<th>Remarks</th>
 </tr>
 </thead>
 <tbody></tbody>
@@ -139,6 +192,28 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 //Connect to Firebase authentication
 const auth = getAuth(app);
+// Monthly maintenance amount for each flat
+// CHANGE THESE AMOUNTS TO YOUR ACTUAL AMOUNTS
+
+const maintenanceRates = {
+
+    "GF1": 310,
+    "GF2": 250,
+    "GF3": 250,
+
+    "1stFloor 1": 500,
+    "1stFloor 2": 500,
+
+    "2ndFloor 1": 295,
+    "2ndFloor 2": 275,
+    "2ndFloor 3": 300,
+    "2ndFloor 4": 260,
+
+    "3rdFloor 1": 495,
+    "3rdFloor 2": 500,
+    "3rdFloor 3": 500
+};
+
 
 
 async function login() {
@@ -202,50 +277,264 @@ async function logout() {
 }
 
 
+function flatSelected() {
 
-  
-async function add() {
-const owner = document.getElementById("owner").value;
-
-    const date = document.getElementById("date").value;
     const flat = document.getElementById("flat").value;
-    const type = document.getElementById("type").value;
-    const amount = document.getElementById("amount").value;
-    const remarks = document.getElementById("remarks").value;
 
-    if (!owner || !date || !flat || !amount) {
-    alert("Please select Owner and enter Date, Flat and Amount.");
-    return;
+    if (!flat) {
+        document.getElementById("maintenanceDue").value = "";
+        document.getElementById("previousBalance").value = "";
+        document.getElementById("balance").value = "";
+        return;
+    }
+
+    const due = maintenanceRates[flat] || 0;
+
+    document.getElementById("maintenanceDue").value = due;
+
+    calculatePreviousBalance(flat);
 }
+
+
+async function calculatePreviousBalance(flat) {
 
     try {
 
-        await addDoc(collection(db, "ledger"), {
-    owner: owner,
-    date: date,
-    flat: flat,
-    type: type,
-    amount: Number(amount),
-    remarks: remarks,
-    createdAt: new Date()
-});
+        const snapshot =
+            await getDocs(collection(db, "ledger"));
 
-        alert("Entry added successfully.");
-document.getElementById("owner").value = "";
-        // Clear the form
-        document.getElementById("date").value = "";
-        document.getElementById("flat").value = "";
-        document.getElementById("amount").value = "";
-        document.getElementById("remarks").value = "";
+        let previousBalance = 0;
 
-        // Refresh the table
-        await loadLedger();
+        snapshot.forEach((doc) => {
+
+            const row = doc.data();
+
+            if (
+                row.flat === flat &&
+                row.type === "Maintenance Received"
+            ) {
+
+                const due =
+                    Number(
+                        row.maintenanceDue ??
+                        maintenanceRates[flat] ??
+                        0
+                    );
+
+                const paid =
+                    Number(
+                        row.actuallyPaid ??
+                        row.amount ??
+                        0
+                    );
+
+                previousBalance += due - paid;
+            }
+
+        });
+
+        document.getElementById("previousBalance").value =
+            previousBalance;
+
+        calculateCurrentBalance();
 
     } catch (error) {
+
         console.error(error);
+
+        alert("Unable to calculate previous balance.");
+    }
+}
+
+
+function calculateCurrentBalance() {
+
+    const due =
+        Number(
+            document.getElementById("maintenanceDue").value
+        ) || 0;
+
+    const paid =
+        Number(
+            document.getElementById("amount").value
+        ) || 0;
+
+    const previous =
+        Number(
+            document.getElementById("previousBalance").value
+        ) || 0;
+
+    const currentBalance =
+        previous + due - paid;
+
+    document.getElementById("balance").value =
+        currentBalance;
+}
+  
+async function add() {
+
+    const owner =
+        document.getElementById("owner").value;
+
+    const date =
+    document.getElementById("date").value;
+
+const maintenanceMonth =
+    document.getElementById("maintenanceMonth").value;
+
+
+    const flat =
+        document.getElementById("flat").value;
+
+    const type =
+        document.getElementById("type").value;
+
+    const amount =
+        Number(
+            document.getElementById("amount").value
+        ) || 0;
+
+    const remarks =
+        document.getElementById("remarks").value;
+
+
+    if (!owner || !date || !maintenanceMonth || !flat || !amount) {
+
+    alert(
+        "Please select Owner, Maintenance Month, Date, Flat and enter Amount."
+    );
+
+    return;
+}
+
+
+    try {
+
+        let maintenanceDue = 0;
+        let previousBalance = 0;
+        let balance = 0;
+
+
+        if (type === "Maintenance Received") {
+
+            maintenanceDue =
+                maintenanceRates[flat] || 0;
+
+
+            const snapshot =
+                await getDocs(collection(db, "ledger"));
+
+
+            snapshot.forEach((doc) => {
+
+                const row = doc.data();
+
+
+                if (
+                    row.flat === flat &&
+                    row.type === "Maintenance Received"
+                ) {
+
+                    const oldDue =
+                        Number(
+                            row.maintenanceDue ??
+                            maintenanceRates[flat] ??
+                            0
+                        );
+
+
+                    const oldPaid =
+                        Number(
+                            row.actuallyPaid ??
+                            row.amount ??
+                            0
+                        );
+
+
+                    previousBalance +=
+                        oldDue - oldPaid;
+                }
+
+            });
+
+
+            balance =
+                previousBalance +
+                maintenanceDue -
+                amount;
+        }
+
+
+        await addDoc(
+            collection(db, "ledger"),
+            {
+
+                owner: owner,
+   maintenanceMonth: maintenanceMonth,
+
+
+                date: date,
+
+                flat: flat,
+
+                type: type,
+
+                amount: amount,
+
+                maintenanceDue:
+                    maintenanceDue,
+
+                actuallyPaid:
+                    type === "Maintenance Received"
+                        ? amount
+                        : 0,
+
+                previousBalance:
+                    previousBalance,
+
+                balance:
+                    balance,
+
+                remarks:
+                    remarks,
+
+                createdAt:
+                    new Date()
+            }
+        );
+
+
+        alert("Entry added successfully.");
+
+
+        document.getElementById("owner").value = "";
+
+document.getElementById("maintenanceMonth").value = "";
+
+document.getElementById("date").value = "";
+
+        document.getElementById("flat").value = "";
+
+        document.getElementById("amount").value = "";
+
+        document.getElementById("maintenanceDue").value = "";
+
+        document.getElementById("previousBalance").value = "";
+
+        document.getElementById("balance").value = "";
+
+        document.getElementById("remarks").value = "";
+
+
+        await loadLedger();
+
+
+    } catch (error) {
+
+        console.error(error);
+
         alert(error.message);
     }
-
 }
 
 
@@ -265,11 +554,44 @@ async function loadLedger() {
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
-    <td>${row.owner || ""}</td>
-    <td>${row.date || ""}</td>
-    <td>${row.flat || ""}</td>
+<td>${row.owner || ""}</td>
+<td>${row.maintenanceMonth || ""}</td>
+<td>${row.date || ""}</td>
+<td>${row.flat || ""}</td>
     <td>${row.type || ""}</td>
-    <td>${row.amount || ""}</td>
+
+    <td>
+        ${
+            row.type === "Maintenance Received"
+            ? "₹" + (row.maintenanceDue || 0)
+            : ""
+        }
+    </td>
+
+    <td>
+        ${
+            row.type === "Maintenance Received"
+            ? "₹" + (row.actuallyPaid ?? row.amount ?? 0)
+            : ""
+        }
+    </td>
+
+    <td>
+        ${
+            row.type === "Maintenance Received"
+            ? "₹" + (row.previousBalance || 0)
+            : ""
+        }
+    </td>
+
+    <td>
+        ${
+            row.type === "Maintenance Received"
+            ? "₹" + (row.balance || 0)
+            : ""
+        }
+    </td>
+
     <td>${row.remarks || ""}</td>
 `;
 
@@ -311,32 +633,55 @@ async function download() {
 
         const snapshot = await getDocs(collection(db, "ledger"));
 
-        let csv = "Owner,Date,Flat,Type,Amount,Remarks\n";
+        let csv =
+    "Owner,Maintenance Month,Date,Flat,Type,Maintenance Due,Actually Paid,Previous Outstanding,Current Outstanding,Remarks\n";
+
         snapshot.forEach((doc) => {
 
             const row = doc.data();
 
-            csv += `"${row.owner || ""}","${row.date || ""}","${row.flat || ""}","${row.type || ""}","${row.amount || ""}","${row.remarks || ""}"\n`;
+            csv +=
+    `"${row.owner || ""}",` +
+    `"${row.maintenanceMonth || ""}",` +
+    `"${row.date || ""}",` +
+    `"${row.flat || ""}",` +
+    `"${row.type || ""}",` +
+    `"${row.maintenanceDue || 0}",` +
+    `"${row.actuallyPaid ?? row.amount ?? 0}",` +
+    `"${row.previousBalance || 0}",` +
+    `"${row.balance || 0}",` +
+    `"${row.remarks || ""}"\n`;
 
         });
 
-        const blob = new Blob([csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
+        const blob =
+            new Blob([csv], { type: "text/csv" });
 
-        const a = document.createElement("a");
+        const url =
+            URL.createObjectURL(blob);
+
+        const a =
+            document.createElement("a");
+
         a.href = url;
-        a.download = "Building_Maintenance_Ledger.csv";
+
+        a.download =
+            "Building_Maintenance_Ledger.csv";
+
         document.body.appendChild(a);
+
         a.click();
+
         document.body.removeChild(a);
 
         URL.revokeObjectURL(url);
 
     } catch (error) {
+
         console.error(error);
+
         alert("Failed to export CSV.");
     }
-
 }
 
 
