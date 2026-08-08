@@ -347,28 +347,105 @@ async function calculatePreviousBalance(flat) {
 }
 
 
-function calculateCurrentBalance() {
+async function calculatePreviousBalance() {
 
-    const due =
-        Number(
-            document.getElementById("maintenanceDue").value
-        ) || 0;
+    try {
 
-    const paid =
-        Number(
-            document.getElementById("amount").value
-        ) || 0;
+        const owner =
+            document.getElementById("owner").value;
 
-    const previous =
-        Number(
-            document.getElementById("previousBalance").value
-        ) || 0;
+        const flat =
+            document.getElementById("flat").value;
 
-    const currentBalance =
-        previous + due - paid;
+        const maintenanceMonth =
+            document.getElementById("maintenanceMonth").value;
 
-    document.getElementById("balance").value =
-        currentBalance;
+        if (!owner || !flat || !maintenanceMonth) {
+            document.getElementById("previousBalance").value = "";
+            document.getElementById("balance").value = "";
+            return;
+        }
+
+        // Example: 2026-08
+        const [year, month] =
+            maintenanceMonth.split("-").map(Number);
+
+        // January = 1, August = 8
+        const numberOfMonths = month;
+
+        // Monthly maintenance rate
+        const monthlyDue =
+            maintenanceRates[flat] || 0;
+
+        // Total maintenance that should have been paid
+        // from January through selected month
+        const totalMaintenanceDue =
+            monthlyDue * numberOfMonths;
+
+
+        const snapshot =
+            await getDocs(collection(db, "ledger"));
+
+        let totalPaidBeforeCurrentEntry = 0;
+
+
+        snapshot.forEach((doc) => {
+
+            const row = doc.data();
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received" &&
+                row.maintenanceMonth
+            ) {
+
+                const [rowYear, rowMonth] =
+                    row.maintenanceMonth
+                        .split("-")
+                        .map(Number);
+
+                // Only payments from January
+                // through the selected month
+                if (
+                    rowYear === year &&
+                    rowMonth <= month
+                ) {
+
+                    const paid =
+                        Number(
+                            row.actuallyPaid ??
+                            row.amount ??
+                            0
+                        );
+
+                    totalPaidBeforeCurrentEntry += paid;
+                }
+            }
+
+        });
+
+
+        // Previous outstanding BEFORE current payment
+        const previousOutstanding =
+            totalMaintenanceDue -
+            totalPaidBeforeCurrentEntry;
+
+
+        document.getElementById("previousBalance").value =
+            previousOutstanding;
+
+
+        calculateCurrentBalance();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Unable to calculate previous balance.");
+
+    }
 }
   
 async function add() {
