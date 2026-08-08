@@ -5,7 +5,6 @@
         <select id="owner">
             <option value="">-- Select Owner --</option>
             <option value="Arpita Chakraborty">Arpita Chakraborty</option>
-            <option value="Owner 2">Arpita Halder</option>
             <option value="Owner 3">Owner 3</option>
             <option value="Owner 4">Owner 4</option>
             <option value="Owner 5">Owner 5</option>
@@ -27,7 +26,10 @@
     <td>Flat</td>
     <td>
         <select id="flat">
-            <option value="GF1">Select Flat</option>
+            <option value="GF1">GF1</option>
+ <option value="GF2">GF2</option>
+            <option value="1stFloor 1">1stFloor 1</option>
+ <option value="1stFloor 2">1stFloor 2</option>
         </select>
     </td>
 </tr>
@@ -100,10 +102,10 @@ const owner = document.getElementById("owner").value;
     const amount = document.getElementById("amount").value;
     const remarks = document.getElementById("remarks").value;
 
-    if (!date || !flat || !amount) {
-        alert("Please enter Date, Flat and Amount.");
-        return;
-    }
+    if (!owner || !date || !flat || !amount) {
+    alert("Please select Owner and enter Date, Flat and Amount.");
+    return;
+}
 
     try {
 
@@ -171,7 +173,7 @@ async function loadLedger() {
 
 }
 
-async function loadFlats() {
+/*async function loadFlats() {
     const select = document.getElementById("flat");
     
     select.innerHTML = '<option value="">Select Flat</option>';
@@ -187,7 +189,7 @@ async function loadFlats() {
 
         select.appendChild(option);
     });
-}
+}*/
 
 
 
@@ -230,53 +232,6 @@ async function download() {
 window.add = add;
 window.download = download;
 
-loadFlats();
-loadLedger();
-</script></body></html>    alert(error.message);
-}
-
-}
-
-
-
-
-async function download() {
-
-    try {
-
-        const snapshot = await getDocs(collection(db, "ledger"));
-
-        let csv = "Date,Flat,Type,Amount,Remarks\n";
-
-        snapshot.forEach((doc) => {
-
-            const row = doc.data();
-
-            csv += `"${row.date || ""}","${row.flat || ""}","${row.type || ""}","${row.amount || ""}","${row.remarks || ""}"\n`;
-
-        });
-
-        const blob = new Blob([csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "Building_Maintenance_Ledger.csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        URL.revokeObjectURL(url);
-
-    } catch (error) {
-        console.error(error);
-        alert("Failed to export CSV.");
-    }
-
-}
-
-
-window.add = add;
-window.download = download;
+//loadFlats();
 loadLedger();
 </script></body></html>
