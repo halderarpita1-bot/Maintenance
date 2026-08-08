@@ -22,15 +22,15 @@
     <td>  
         <select id="owner">  
             <option value="">-- Select Owner --</option>  
-            //3rd Floor  
+            
             <option value="Arpita Chakraborty">Arpita Chakraborty</option>  <option value="Chandan Kumar">Chandan Kumar</option>  
           
-        //2nd Floor  
+         
         <option value="Sanjay Chanda">Sanjay Chanda</option>  
-        //1st Floor  
+        
         <option value="Gita Ganguly">Gita Ganguly</option>  
         <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>  
-        //GF  
+         
         <option value="Argha Ghosh">Argha Ghosh</option>  
         <option value="Bhola">Bhola</option>  
           
@@ -38,6 +38,10 @@
         <option value="Anil Rudra">Anil Rudra</option>  
         <option value="Srijani Nandi">Srijani Nandi</option>  
     </select>  
+    
+    
+    
+    
 </td>
 
 </tr>  
@@ -109,6 +113,45 @@
 </table><button onclick="add()">Add Entry</button>
 <button onclick="download()">Export CSV</button>
 <button onclick="recalculateLedger()">Recalculate Ledger</button>
+
+
+<div style="margin:15px 0;">
+
+    <label>
+        <strong>Filter Owner:</strong>
+    </label>
+
+    <select id="filterOwner" onchange="filterLedger()">
+        <option value="">All Owners</option>
+
+        <option value="Arpita Chakraborty">Arpita Chakraborty</option>
+        <option value="Chandan Kumar">Chandan Kumar</option>
+        <option value="Sanjay Chanda">Sanjay Chanda</option>
+        <option value="Gita Ganguly">Gita Ganguly</option>
+        <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
+        <option value="Argha Ghosh">Argha Ghosh</option>
+        <option value="Bhola">Bhola</option>
+        <option value="Krishna Halder">Krishna Halder</option>
+        <option value="Anil Rudra">Anil Rudra</option>
+        <option value="Srijani Nandi">Srijani Nandi</option>
+
+    </select>
+
+
+    <label style="margin-left:15px;">
+        <strong>Filter Year:</strong>
+    </label>
+
+    <select id="filterYear" onchange="filterLedger()">
+        <option value="">All Years</option>
+    </select>
+
+
+    <button onclick="clearFilters()">
+        Clear Filters
+    </button>
+
+</div>
 <table id="tbl">  
 <thead>  
 <tr>  
@@ -183,6 +226,15 @@ const maintenanceRates = {
 "3rdFloor 3": 500
 
 };
+
+// STEP 9:
+// Maintenance calculation starts from January
+// of the current calendar year automatically.
+
+const currentYear = new Date().getFullYear();
+
+const maintenanceStartMonth =
+    currentYear + "-01";
 
 async function login() {
 
@@ -267,123 +319,203 @@ calculatePreviousBalance();
 
 async function calculatePreviousBalance() {
 
-try {  
+    const owner =
+        document.getElementById("owner").value;
 
-    const owner =  
-        document.getElementById("owner").value;  
+    const flat =
+        document.getElementById("flat").value;
 
-    const flat =  
-        document.getElementById("flat").value;  
-
-    const maintenanceMonth =  
-        document.getElementById("maintenanceMonth").value;  
-
-    if (!owner || !flat || !maintenanceMonth) {  
-        document.getElementById("previousBalance").value = "";  
-        document.getElementById("balance").value = "";  
-        return;  
-    }  
-
-    const [year, month] =  
-        maintenanceMonth.split("-").map(Number);  
-
-    const monthlyDue =  
-        maintenanceRates[flat] || 0;  
-
-    // January = 1, February = 2 ... August = 8  
-    const totalMaintenanceDue =  
-        monthlyDue * month;  
-
-    const snapshot =  
-        await getDocs(collection(db, "ledger"));  
-
-    let totalPaidBeforeCurrentMonth = 0;  
-
-    let totalPaidUpToCurrentMonth = 0;  
-
-    snapshot.forEach((doc) => {  
-
-        const row = doc.data();  
-
-        if (  
-            row.owner === owner &&  
-            row.flat === flat &&  
-            row.type === "Maintenance Received" &&  
-            row.maintenanceMonth  
-        ) {  
-
-            const [rowYear, rowMonth] =  
-                row.maintenanceMonth  
-                    .split("-")  
-                    .map(Number);  
-
-            if (rowYear === year) {  
-
-                const paid =  
-                    Number(  
-                        row.actuallyPaid ??  
-                        row.amount ??  
-                        0  
-                    );  
-
-                // Payments before selected month  
-                if (rowMonth < month) {  
-                    totalPaidBeforeCurrentMonth += paid;  
-                }  
-
-                // Payments up to selected month  
-                if (rowMonth <= month) {  
-                    totalPaidUpToCurrentMonth += paid;  
-                }  
-            }  
-        }  
-    });  
+    const maintenanceMonth =
+        document.getElementById("maintenanceMonth").value;
 
 
-    /*  
-     * PREVIOUS OUTSTANDING  
-     *  
-     * Jan -> selected month total due  
-     * minus payments before selected month  
-     *  
-     * Example:  
-     * August = 8 months  
-     * 495 × 8 = 3960  
-     * Previous payments = 0  
-     *  
-     * Previous Outstanding = 3960  
-     */  
+    if (!owner || !flat || !maintenanceMonth) {
 
-    const previousOutstanding =  
-        totalMaintenanceDue -  
-        totalPaidBeforeCurrentMonth;  
+        document.getElementById("previousBalance").value = "";
+        document.getElementById("balance").value = "";
+
+        return;
+    }
 
 
-    /*  
-     * CURRENT OUTSTANDING  
-     *  
-     * Total Jan-current due  
-     * minus all payments Jan-current  
-     */  
+    try {
 
-    const currentOutstanding =  
-        totalMaintenanceDue -  
-        totalPaidUpToCurrentMonth;  
+        const [year, month] =
+            maintenanceMonth
+                .split("-")
+                .map(Number);
 
 
-    document.getElementById("previousBalance").value =  
-        previousOutstanding;  
-
-    document.getElementById("balance").value =  
-        currentOutstanding;  
+        const monthlyDue =
+            maintenanceRates[flat] || 0;
 
 
-} catch (error) {  
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
 
-    console.error(error);  
 
-    alert("Unable to calculate outstanding.");  
-}
+        const records = [];
+
+
+        snapshot.forEach((document) => {
+
+            const row =
+                document.data();
+
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received" &&
+                row.maintenanceMonth
+            ) {
+
+                records.push(row);
+
+            }
+
+        });
+
+
+        /*
+         * Find the first recorded year.
+         */
+
+        /*
+ * STEP 9:
+ * Maintenance calculation starts from
+ * January of the current year.
+ */
+
+const [startYear, startMonth] =
+    maintenanceStartMonth
+        .split("-")
+        .map(Number);
+
+
+        /*
+         * Number of months before
+         * the selected month.
+         */
+
+        const monthsBeforeCurrent =
+    (
+        (year - startYear) * 12
+    ) +
+    (month - startMonth);
+
+
+        /*
+         * Maintenance due before
+         * the selected month.
+         */
+
+        const totalDueBeforeCurrent =
+            monthlyDue *
+            Math.max(
+                monthsBeforeCurrent,
+                0
+            );
+
+
+        /*
+         * Calculate all payments
+         * before the selected month.
+         */
+
+        let totalPaidBeforeCurrentMonth = 0;
+
+
+        records.forEach((row) => {
+
+            const [rowYear, rowMonth] =
+                row.maintenanceMonth
+                    .split("-")
+                    .map(Number);
+
+
+const rowPeriod =
+    (
+        (rowYear - startYear) * 12
+    ) +
+    (rowMonth - startMonth);
+
+
+const currentPeriod =
+    (
+        (year - startYear) * 12
+    ) +
+    (month - startMonth);
+                
+
+
+            if (rowPeriod < currentPeriod) {
+
+                const paid =
+                    Number(
+                        row.actuallyPaid ??
+                        row.amount ??
+                        0
+                    );
+
+
+                totalPaidBeforeCurrentMonth +=
+                    paid;
+
+            }
+
+        });
+
+
+        /*
+         * Previous Outstanding
+         */
+
+        const previousBalance =
+            totalDueBeforeCurrent -
+            totalPaidBeforeCurrentMonth;
+
+
+        /*
+         * Current month's maintenance
+         */
+
+        const currentBalanceBeforePayment =
+            previousBalance +
+            monthlyDue;
+
+
+        document.getElementById("previousBalance").value =
+            previousBalance;
+
+
+        document.getElementById("balance").value =
+            currentBalanceBeforePayment;
+
+
+        /*
+         * Recalculate after loading
+         * the previous balance.
+         */
+
+        await calculateCurrentBalance();
+
+
+    } catch (error) {
+
+        console.error(
+            "PREVIOUS BALANCE ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to calculate outstanding: " +
+            error.message
+        );
+
+    }
 
 }
 
@@ -395,23 +527,126 @@ document.getElementById("owner")
 document.getElementById("maintenanceMonth")
 .addEventListener("change", calculatePreviousBalance);
 
-function calculateCurrentBalance() {
+async function calculateCurrentBalance() {
 
-const previous =  
-    Number(  
-        document.getElementById("previousBalance").value  
-    ) || 0;  
+    const owner =
+        document.getElementById("owner").value;
 
-const paid =  
-    Number(  
-        document.getElementById("amount").value  
-    ) || 0;  
+    const flat =
+        document.getElementById("flat").value;
 
-const currentBalance =  
-    previous - paid;  
+    const maintenanceMonth =
+        document.getElementById("maintenanceMonth").value;
 
-document.getElementById("balance").value =  
-    currentBalance;
+    const paidNow =
+        Number(
+            document.getElementById("amount").value
+        ) || 0;
+
+
+    if (!owner || !flat || !maintenanceMonth) {
+
+        document.getElementById("balance").value = "";
+
+        return;
+
+    }
+
+
+    try {
+
+        const [year, month] =
+            maintenanceMonth
+                .split("-")
+                .map(Number);
+
+
+        const monthlyDue =
+            maintenanceRates[flat] || 0;
+
+
+        /*
+         * Previous Outstanding has already
+         * been calculated.
+         */
+
+        const previousBalance =
+            Number(
+                document.getElementById("previousBalance").value
+            ) || 0;
+
+
+        /*
+         * Find payments already received
+         * for the selected maintenance month.
+         */
+
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+
+        let paidInCurrentMonth = 0;
+
+
+        snapshot.forEach((document) => {
+
+            const row =
+                document.data();
+
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received" &&
+                row.maintenanceMonth === maintenanceMonth
+            ) {
+
+                const paid =
+                    Number(
+                        row.actuallyPaid ??
+                        row.amount ??
+                        0
+                    );
+
+
+                paidInCurrentMonth +=
+                    paid;
+
+            }
+
+        });
+
+
+        /*
+         * Current Outstanding =
+         *
+         * Previous Outstanding
+         * + Current Month Due
+         * - Existing Current Month Payments
+         * - New Payment
+         */
+
+        const currentBalance =
+            previousBalance +
+            monthlyDue -
+            paidInCurrentMonth -
+            paidNow;
+
+
+        document.getElementById("balance").value =
+            currentBalance;
+
+
+    } catch (error) {
+
+        console.error(
+            "CURRENT BALANCE ERROR:",
+            error
+        );
+
+    }
 
 }
 
@@ -426,9 +661,15 @@ async function recalculateLedger() {
     try {
 
         const snapshot =
-            await getDocs(collection(db, "ledger"));
+            await getDocs(
+                collection(db, "ledger")
+            );
 
-        // Convert Firestore documents into an array
+        /*
+         * Convert Firestore documents
+         * into an array.
+         */
+
         const records = [];
 
         snapshot.forEach((document) => {
@@ -440,14 +681,35 @@ async function recalculateLedger() {
 
         });
 
+        /*
+         * Maintenance calculation starts
+         * from January 2026.
+         *
+         * IMPORTANT:
+         * Keep this fixed so that the calculation
+         * does not change automatically next year.
+         */
+
+        const maintenanceStartMonth = "2026-01";
+
+        const [startYear, startMonth] =
+            maintenanceStartMonth
+                .split("-")
+                .map(Number);
 
         /*
-         * Process every Maintenance Received record
+         * Process every maintenance record.
          */
 
         for (const record of records) {
 
-            const row = record.data;
+            const row =
+                record.data;
+
+            /*
+             * Only Maintenance Received records
+             * participate in outstanding calculation.
+             */
 
             if (
                 row.type !== "Maintenance Received" ||
@@ -458,40 +720,71 @@ async function recalculateLedger() {
                 continue;
             }
 
-
             const [year, month] =
                 row.maintenanceMonth
                     .split("-")
                     .map(Number);
 
-
             const monthlyDue =
                 maintenanceRates[row.flat] || 0;
 
-
             /*
-             * Total maintenance due
-             * from January through selected month
+             * Calculate the period number
+             * relative to January 2026.
+             *
+             * January 2026 = 0
+             * February 2026 = 1
+             * March 2026 = 2
+             * etc.
              */
 
-            const totalMaintenanceDue =
-                monthlyDue * month;
+            const currentPeriod =
+                (
+                    (year - startYear) * 12
+                ) +
+                (month - startMonth);
 
+            /*
+             * If the record is before January 2026,
+             * do not calculate maintenance due for it.
+             */
+
+            if (currentPeriod < 0) {
+                continue;
+            }
+
+            /*
+             * Maintenance due BEFORE
+             * the current month.
+             *
+             * Example:
+             *
+             * August 2026
+             *
+             * Jan-Jul = 7 months
+             */
+
+            const monthsBeforeCurrent =
+                currentPeriod;
+
+            const totalDueBeforeCurrent =
+                monthlyDue *
+                Math.max(
+                    monthsBeforeCurrent,
+                    0
+                );
+
+            /*
+             * Calculate ALL payments made
+             * before the current month.
+             */
 
             let totalPaidBeforeCurrentMonth = 0;
-            let totalPaidUpToCurrentMonth = 0;
-
-
-            /*
-             * Look through ALL records belonging
-             * to the same owner, flat and year.
-             */
 
             records.forEach((otherRecord) => {
 
                 const other =
                     otherRecord.data;
-
 
                 if (
                     other.owner === row.owner &&
@@ -505,8 +798,25 @@ async function recalculateLedger() {
                             .split("-")
                             .map(Number);
 
+                    const otherPeriod =
+                        (
+                            (otherYear - startYear) * 12
+                        ) +
+                        (otherMonth - startMonth);
 
-                    if (otherYear === year) {
+                    /*
+                     * IMPORTANT:
+                     *
+                     * Ignore payments before January 2026.
+                     *
+                     * Count only payments strictly
+                     * before the current month.
+                     */
+
+                    if (
+                        otherPeriod >= 0 &&
+                        otherPeriod < currentPeriod
+                    ) {
 
                         const paid =
                             Number(
@@ -515,71 +825,112 @@ async function recalculateLedger() {
                                 0
                             );
 
-
-                        /*
-                         * Payments before this record's month
-                         */
-
-                        if (otherMonth < month) {
-
-                            totalPaidBeforeCurrentMonth +=
-                                paid;
-
-                        }
-
-
-                        /*
-                         * Payments up to and including
-                         * this record's month
-                         */
-
-                        if (otherMonth <= month) {
-
-                            totalPaidUpToCurrentMonth +=
-                                paid;
-
-                        }
-
+                        totalPaidBeforeCurrentMonth +=
+                            paid;
                     }
-
                 }
-
             });
 
-
             /*
-             * IMPORTANT:
+             * PREVIOUS OUTSTANDING
              *
-             * The current record's payment is already
-             * included in totalPaidUpToCurrentMonth.
-             *
-             * Therefore:
-             *
-             * Previous Outstanding =
-             * Jan-current due
-             * minus payments before current month
-             *
-             * Current Outstanding =
-             * Jan-current due
-             * minus all payments through current month
+             * Maintenance due before current month
+             * minus
+             * payments before current month.
              */
 
             const previousBalance =
-                totalMaintenanceDue -
+                totalDueBeforeCurrent -
                 totalPaidBeforeCurrentMonth;
 
+            /*
+             * Calculate ALL payments received
+             * up to and including current month.
+             */
 
-            const currentBalance =
-                totalMaintenanceDue -
-                totalPaidUpToCurrentMonth;
+            let totalPaidUpToCurrentMonth = 0;
 
+            records.forEach((otherRecord) => {
+
+                const other =
+                    otherRecord.data;
+
+                if (
+                    other.owner === row.owner &&
+                    other.flat === row.flat &&
+                    other.type === "Maintenance Received" &&
+                    other.maintenanceMonth
+                ) {
+
+                    const [otherYear, otherMonth] =
+                        other.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+                    const otherPeriod =
+                        (
+                            (otherYear - startYear) * 12
+                        ) +
+                        (otherMonth - startMonth);
+
+                    /*
+                     * IMPORTANT:
+                     *
+                     * Ignore payments before January 2026.
+                     *
+                     * Include payments from January 2026
+                     * through the current month.
+                     */
+
+                    if (
+                        otherPeriod >= 0 &&
+                        otherPeriod <= currentPeriod
+                    ) {
+
+                        const paid =
+                            Number(
+                                other.actuallyPaid ??
+                                other.amount ??
+                                0
+                            );
+
+                        totalPaidUpToCurrentMonth +=
+                            paid;
+                    }
+                }
+            });
 
             /*
-             * Update Firestore record
+             * Total maintenance due INCLUDING
+             * the current month.
+             */
+
+            const totalDueThroughCurrent =
+                totalDueBeforeCurrent +
+                monthlyDue;
+
+            /*
+             * CURRENT OUTSTANDING
+             *
+             * Total due through current month
+             * minus
+             * all payments through current month.
+             */
+
+            const currentBalance =
+                totalDueThroughCurrent -
+                totalPaidUpToCurrentMonth;
+
+            /*
+             * Update Firestore.
              */
 
             await updateDoc(
-                doc(db, "ledger", record.id),
+                doc(
+                    db,
+                    "ledger",
+                    record.id
+                ),
                 {
                     maintenanceDue:
                         monthlyDue,
@@ -591,18 +942,17 @@ async function recalculateLedger() {
                         currentBalance
                 }
             );
-
         }
-
 
         alert(
             "Ledger recalculated successfully."
         );
 
+        /*
+         * Reload the ledger after recalculation.
+         */
 
-        // Refresh table
         await loadLedger();
-
 
     } catch (error) {
 
@@ -615,7 +965,6 @@ async function recalculateLedger() {
             "Failed to recalculate ledger: " +
             error.message
         );
-
     }
 }
 
@@ -645,7 +994,13 @@ async function add() {
         document.getElementById("remarks").value;
 
 
-    if (!owner || !date || !maintenanceMonth || !flat || !amount) {
+    if (
+        !owner ||
+        !date ||
+        !maintenanceMonth ||
+        !flat ||
+        !amount
+    ) {
 
         alert(
             "Please select Owner, Maintenance Month, Date, Flat and enter Amount."
@@ -653,12 +1008,86 @@ async function add() {
 
         return;
     }
+    /*
+     * STEP 8:
+     * Prevent duplicate maintenance entries
+     * for the same owner + flat + month.
+     */
 
+    try {
+
+        const existingSnapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+
+        let duplicateFound = false;
+
+
+        existingSnapshot.forEach((document) => {
+
+            const row =
+                document.data();
+
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received" &&
+                row.maintenanceMonth === maintenanceMonth
+            ) {
+
+                duplicateFound = true;
+
+            }
+
+        });
+
+
+        if (duplicateFound) {
+
+            const proceed =
+                confirm(
+                    "A maintenance entry already exists for this Owner, Flat and Month.\n\n" +
+                    "Owner: " + owner + "\n" +
+                    "Flat: " + flat + "\n" +
+                    "Month: " + maintenanceMonth + "\n\n" +
+                    "Do you want to add another payment for the same month?"
+                );
+
+
+            if (!proceed) {
+
+                return;
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "DUPLICATE CHECK ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to check for duplicate entry: " +
+            error.message
+        );
+
+        return;
+
+    }
 
     try {
 
         const [year, month] =
-            maintenanceMonth.split("-").map(Number);
+            maintenanceMonth
+                .split("-")
+                .map(Number);
+
 
         const monthlyDue =
             maintenanceRates[flat] || 0;
@@ -668,35 +1097,81 @@ async function add() {
         let currentBalance = 0;
 
 
+        /*
+         * Only maintenance receipts affect
+         * the maintenance outstanding balance.
+         */
+
         if (type === "Maintenance Received") {
 
+            const snapshot =
+                await getDocs(
+                    collection(db, "ledger")
+                );
+
+
             /*
-             * TOTAL MAINTENANCE DUE
-             *
-             * January to selected month
+             * Find the first recorded year
+             * for this owner + flat.
              */
 
-            const totalMaintenanceDue =
-                monthlyDue * month;
+            /*
+ * STEP 9:
+ * Maintenance calculation starts from
+ * January of the current calendar year.
+ */
+
+const [startYear, startMonth] =
+    maintenanceStartMonth
+        .split("-")
+        .map(Number);
+
+            /*
+             * Number of months before
+             * the selected maintenance month.
+             *
+             * Example:
+             *
+             * First year = 2025
+             * Selected = 2026-08
+             *
+             * Months before August 2026 =
+             * 19 months
+             */
+
+            const monthsBeforeCurrent =
+    (
+        (year - startYear) * 12
+    ) +
+    (month - startMonth);
 
 
-            const snapshot =
-                await getDocs(collection(db, "ledger"));
+            /*
+             * Total maintenance due
+             * before the selected month.
+             */
 
+            const totalDueBeforeCurrent =
+                monthlyDue *
+                Math.max(
+                    monthsBeforeCurrent,
+                    0
+                );
+
+
+            /*
+             * Calculate ALL payments made
+             * before the selected month.
+             */
 
             let totalPaidBeforeCurrentMonth = 0;
-            let totalPaidUpToCurrentMonth = 0;
 
 
-            snapshot.forEach((doc) => {
+            snapshot.forEach((document) => {
 
-                const row = doc.data();
+                const row =
+                    document.data();
 
-
-                /*
-                 * Only consider the SAME owner,
-                 * SAME flat and SAME year.
-                 */
 
                 if (
                     row.owner === owner &&
@@ -711,7 +1186,23 @@ async function add() {
                             .map(Number);
 
 
-                    if (rowYear === year) {
+                    const rowPeriod =
+    (
+        (rowYear - startYear) * 12
+    ) +
+    (rowMonth - startMonth);
+
+
+const currentPeriod =
+    (
+        (year - startYear) * 12
+    ) +
+    (month - startMonth);
+
+
+                    if (
+                        rowPeriod < currentPeriod
+                    ) {
 
                         const paid =
                             Number(
@@ -721,26 +1212,8 @@ async function add() {
                             );
 
 
-                        /*
-                         * Payments before selected month
-                         */
-
-                        if (rowMonth < month) {
-
-                            totalPaidBeforeCurrentMonth += paid;
-
-                        }
-
-
-                        /*
-                         * Payments up to selected month
-                         */
-
-                        if (rowMonth <= month) {
-
-                            totalPaidUpToCurrentMonth += paid;
-
-                        }
+                        totalPaidBeforeCurrentMonth +=
+                            paid;
 
                     }
 
@@ -752,30 +1225,77 @@ async function add() {
             /*
              * PREVIOUS OUTSTANDING
              *
-             * Jan → selected month due
-             * minus payments before selected month
+             * All maintenance due before
+             * current month
+             *
+             * minus
+             *
+             * all payments before current month.
              */
 
             previousBalance =
-                totalMaintenanceDue -
+                totalDueBeforeCurrent -
                 totalPaidBeforeCurrentMonth;
+
+
+            /*
+             * Find payments already received
+             * for the CURRENT maintenance month.
+             */
+
+            let paidInCurrentMonth = 0;
+
+
+            snapshot.forEach((document) => {
+
+                const row =
+                    document.data();
+
+
+                if (
+                    row.owner === owner &&
+                    row.flat === flat &&
+                    row.type === "Maintenance Received" &&
+                    row.maintenanceMonth === maintenanceMonth
+                ) {
+
+                    const paid =
+                        Number(
+                            row.actuallyPaid ??
+                            row.amount ??
+                            0
+                        );
+
+
+                    paidInCurrentMonth +=
+                        paid;
+
+                }
+
+            });
 
 
             /*
              * CURRENT OUTSTANDING
              *
-             * Jan → selected month due
-             * minus existing payments
-             * minus current payment
+             * Previous Outstanding
+             * + Current Month Maintenance
+             * - Existing Current Month Payments
+             * - New Payment
              */
 
             currentBalance =
-                totalMaintenanceDue -
-                totalPaidUpToCurrentMonth -
+                previousBalance +
+                monthlyDue -
+                paidInCurrentMonth -
                 amount;
 
         }
 
+
+        /*
+         * Save the new record.
+         */
 
         await addDoc(
             collection(db, "ledger"),
@@ -822,11 +1342,13 @@ async function add() {
         );
 
 
-        alert("Entry added successfully.");
+        alert(
+            "Entry added successfully."
+        );
 
 
         /*
-         * Clear form
+         * Clear form.
          */
 
         document.getElementById("owner").value = "";
@@ -848,7 +1370,110 @@ async function add() {
         document.getElementById("remarks").value = "";
 
 
+        /*
+         * Refresh ledger.
+         */
+
         await loadLedger();
+
+
+    } catch (error) {
+
+        console.error(
+            "ADD ENTRY ERROR:",
+            error
+        );
+
+        alert(
+            "Failed to add entry: " +
+            error.message
+        );
+
+    }
+
+}
+
+async function loadLedger() {
+
+    const tbody =
+        document.querySelector("#tbl tbody");
+
+    tbody.innerHTML = "";
+
+    try {
+
+        const snapshot =
+            await getDocs(collection(db, "ledger"));
+
+
+        /*
+         * Store records so filterLedger()
+         * can use them without querying Firebase again.
+         */
+
+        window.ledgerRecords = [];
+
+
+        snapshot.forEach((document) => {
+
+            window.ledgerRecords.push({
+                id: document.id,
+                data: document.data()
+            });
+
+        });
+
+
+        /*
+         * Populate Year filter
+         */
+
+        const yearSelect =
+            document.getElementById("filterYear");
+
+        const years = new Set();
+
+
+        window.ledgerRecords.forEach((record) => {
+
+            const row = record.data;
+
+            if (row.maintenanceMonth) {
+
+                const year =
+                    row.maintenanceMonth.substring(0, 4);
+
+                years.add(year);
+
+            }
+
+        });
+
+
+        yearSelect.innerHTML =
+            '<option value="">All Years</option>';
+
+
+        [...years]
+            .sort()
+            .forEach((year) => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = year;
+                option.textContent = year;
+
+                yearSelect.appendChild(option);
+
+            });
+
+
+        /*
+         * Display all records
+         */
+
+        displayLedger(window.ledgerRecords);
 
 
     } catch (error) {
@@ -860,72 +1485,132 @@ async function add() {
     }
 }
 
-async function loadLedger() {
+function filterLedger() {
 
-const tbody = document.querySelector("#tbl tbody");  
-tbody.innerHTML = "";  
+    const selectedOwner =
+        document.getElementById("filterOwner").value;
 
-try {  
+    const selectedYear =
+        document.getElementById("filterYear").value;
 
-    const snapshot = await getDocs(collection(db, "ledger"));  
+    const filteredRecords =
+        window.ledgerRecords.filter((record) => {
 
-    snapshot.forEach((doc) => {  
+            const row = record.data;
 
-        const row = doc.data();  
+            const ownerMatches =
+                !selectedOwner ||
+                row.owner === selectedOwner;
 
-        const tr = document.createElement("tr");  
+            const yearMatches =
+                !selectedYear ||
+                (
+                    row.maintenanceMonth &&
+                    row.maintenanceMonth.startsWith(selectedYear)
+                );
+
+            return ownerMatches && yearMatches;
+
+        });
+
+    displayLedger(filteredRecords);
+}
+
+function displayLedger(records) {
+
+    const tbody =
+        document.querySelector("#tbl tbody");
+
+    tbody.innerHTML = "";
+
+    if (!records || records.length === 0) {
+
+        const tr =
+            document.createElement("tr");
+
+        tr.innerHTML = `
+            <td colspan="10" style="text-align:center;">
+                No records found
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+
+        return;
+    }
+
+
+    records.forEach((record) => {
+
+        const row =
+            record.data;
+
+        const tr =
+            document.createElement("tr");
+
 
         tr.innerHTML = `
 
-<td>${row.owner || ""}</td>  
-<td>${row.maintenanceMonth || ""}</td>  
-<td>${row.date || ""}</td>  
-<td>${row.flat || ""}</td>  
-    <td>${row.type || ""}</td>  <td>  
-    ${  
-        row.type === "Maintenance Received"  
-        ? "₹" + (row.maintenanceDue || 0)  
-        : ""  
-    }  
-</td>  
+<td>${row.owner ?? ""}</td>
 
-<td>  
-    ${  
-        row.type === "Maintenance Received"  
-        ? "₹" + (row.actuallyPaid ?? row.amount ?? 0)  
-        : ""  
-    }  
-</td>  
+<td>${row.maintenanceMonth ?? ""}</td>
 
-<td>  
-    ${  
-        row.type === "Maintenance Received"  
-        ? "₹" + (row.previousBalance || 0)  
-        : ""  
-    }  
-</td>  
+<td>${row.date ?? ""}</td>
 
-<td>  
-    ${  
-        row.type === "Maintenance Received"  
-        ? "₹" + (row.balance || 0)  
-        : ""  
-    }  
-</td>  
+<td>${row.flat ?? ""}</td>
 
-<td>${row.remarks || ""}</td>
+<td>${row.type ?? ""}</td>
+
+<td>
+    ${
+        row.type === "Maintenance Received"
+        ? "₹" + (row.maintenanceDue ?? 0)
+        : ""
+    }
+</td>
+
+<td>
+    ${
+        row.type === "Maintenance Received"
+        ? "₹" + (row.actuallyPaid ?? row.amount ?? 0)
+        : ""
+    }
+</td>
+
+<td>
+    ${
+        row.type === "Maintenance Received"
+        ? "₹" + (row.previousBalance ?? 0)
+        : ""
+    }
+</td>
+
+<td>
+    ${
+        row.type === "Maintenance Received"
+        ? "₹" + (row.balance ?? 0)
+        : ""
+    }
+</td>
+
+<td>${row.remarks ?? ""}</td>
 
 `;
 
-tbody.appendChild(tr);  
 
-    });  
+        tbody.appendChild(tr);
 
-} catch (error) {  
-console.error(error);  
-alert(error.message);
+    });
 
 }
+
+function clearFilters() {
+
+    document.getElementById("filterOwner").value = "";
+
+    document.getElementById("filterYear").value = "";
+
+    displayLedger(window.ledgerRecords);
 
 }
 
@@ -950,67 +1635,265 @@ snapshot.forEach((doc) => {
 
 async function download() {
 
-try {  
+    try {
 
-    const snapshot = await getDocs(collection(db, "ledger"));  
+        /*
+         * Get current filter values
+         */
+        const selectedOwner =
+            document.getElementById("filterOwner").value;
 
-    let csv =  
-"Owner,Maintenance Month,Date,Flat,Type,Maintenance Due,Actually Paid,Previous Outstanding,Current Outstanding,Remarks\n";  
+        const selectedYear =
+            document.getElementById("filterYear").value;
 
-    snapshot.forEach((doc) => {  
 
-        const row = doc.data();  
+        /*
+         * Use the already-loaded ledger records.
+         * This means the CSV follows the filters
+         * currently selected on screen.
+         */
+        const records =
+            (window.ledgerRecords || []).filter((record) => {
 
-        csv +=  
-`"${row.owner || ""}",` +  
-`"${row.maintenanceMonth || ""}",` +  
-`"${row.date || ""}",` +  
-`"${row.flat || ""}",` +  
-`"${row.type || ""}",` +  
-`"${row.maintenanceDue || 0}",` +  
-`"${row.actuallyPaid ?? row.amount ?? 0}",` +  
-`"${row.previousBalance || 0}",` +  
-`"${row.balance || 0}",` +  
-`"${row.remarks || ""}"\n`;  
+                const row = record.data;
 
-    });  
 
-    const blob =  
-        new Blob([csv], { type: "text/csv" });  
+                const ownerMatches =
+                    !selectedOwner ||
+                    row.owner === selectedOwner;
 
-    const url =  
-        URL.createObjectURL(blob);  
 
-    const a =  
-        document.createElement("a");  
+                const yearMatches =
+                    !selectedYear ||
+                    (
+                        row.maintenanceMonth &&
+                        row.maintenanceMonth.startsWith(selectedYear)
+                    );
 
-    a.href = url;  
 
-    a.download =  
-        "Building_Maintenance_Ledger.csv";  
+                return ownerMatches && yearMatches;
 
-    document.body.appendChild(a);  
+            });
 
-    a.click();  
 
-    document.body.removeChild(a);  
+        /*
+         * CSV headers
+         */
+        const headers = [
 
-    URL.revokeObjectURL(url);  
+            "Owner",
+            "Maintenance Month",
+            "Date",
+            "Flat",
+            "Type",
+            "Maintenance Due",
+            "Actually Paid",
+            "Previous Outstanding",
+            "Current Outstanding",
+            "Remarks"
 
-} catch (error) {  
+        ];
 
-    console.error(error);  
 
-    alert("Failed to export CSV.");  
+        /*
+         * Make a value safe for CSV.
+         *
+         * Example:
+         * Soumen, ABC
+         *
+         * becomes:
+         * "Soumen, ABC"
+         *
+         * Quotes inside text are doubled.
+         */
+        function csvField(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                return '""';
+
+            }
+
+
+            return '"' +
+                String(value)
+                    .replace(/"/g, '""') +
+                '"';
+
+        }
+
+
+        /*
+         * Start CSV
+         */
+        let csv =
+            headers
+                .map(csvField)
+                .join(",") +
+            "\n";
+
+
+        /*
+         * Add filtered records
+         */
+        records.forEach((record) => {
+
+            const row =
+                record.data;
+
+
+            const data = [
+
+                row.owner || "",
+
+                row.maintenanceMonth || "",
+
+                row.date || "",
+
+                row.flat || "",
+
+                row.type || "",
+
+                row.type === "Maintenance Received"
+                    ? (row.maintenanceDue ?? 0)
+                    : "",
+
+                row.type === "Maintenance Received"
+                    ? (row.actuallyPaid ?? row.amount ?? 0)
+                    : "",
+
+                row.type === "Maintenance Received"
+                    ? (row.previousBalance ?? 0)
+                    : "",
+
+                row.type === "Maintenance Received"
+                    ? (row.balance ?? 0)
+                    : "",
+
+                row.remarks || ""
+
+            ];
+
+
+            csv +=
+                data
+                    .map(csvField)
+                    .join(",") +
+                "\n";
+
+        });
+
+
+        /*
+         * UTF-8 BOM.
+         *
+         * This helps Excel correctly display
+         * characters such as ₹.
+         */
+        const blob =
+            new Blob(
+                ["\uFEFF" + csv],
+                {
+                    type: "text/csv;charset=utf-8;"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+
+        const a =
+            document.createElement("a");
+
+
+        a.href = url;
+
+
+        /*
+         * Give the file a useful name
+         */
+        let fileName =
+            "Building_Maintenance_Ledger";
+
+
+        if (selectedOwner) {
+
+            fileName +=
+                "_" +
+                selectedOwner
+                    .replace(/\s+/g, "_");
+
+        }
+
+
+        if (selectedYear) {
+
+            fileName +=
+                "_" +
+                selectedYear;
+
+        }
+
+
+        fileName += ".csv";
+
+
+        a.download = fileName;
+
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+
+
+        /*
+         * Inform user if no records matched
+         */
+        if (records.length === 0) {
+
+            alert(
+                "No records found for the selected filters."
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "CSV EXPORT ERROR:",
+            error
+        );
+
+        alert(
+            "Failed to export CSV: " +
+            error.message
+        );
+
+    }
+
 }
 
-}
 
 window.login = login;
 window.logout = logout;
 window.add = add;
 window.download = download;
 
+window.filterLedger = filterLedger;
+window.displayLedger = displayLedger;
+window.clearFilters = clearFilters;
+window.flatSelected = flatSelected;
+window.recalculateLedger = recalculateLedger;
+window.calculateCurrentBalance = calculateCurrentBalance;
 // Check whether the user is already logged in
 onAuthStateChanged(auth, (user) => {
 
