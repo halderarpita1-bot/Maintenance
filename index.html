@@ -1,4 +1,66 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Building Maintenance Ledger</title><style>body{font-family:Arial;margin:20px;max-width:900px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}input{width:100%}</style></head><body><h2>Building Maintenance Ledger</h2><table><tr><td>Date</td><td><input id="date" type="date"></td></tr><tr><td>Flat</td><td><input id="flat"></td></tr><tr><td>Type</td><td><select id="type"><option>Maintenance Received</option><option>Building Expense</option></select></td></tr><tr><td>Amount</td><td><input id="amount" type="number"></td></tr><tr><td>Remarks</td><td><input id="remarks"></td></tr></table><button onclick="add()">Add Entry</button><button onclick="download()">Export CSV</button><table id="tbl"><thead><tr><th>Date</th><th>Flat</th><th>Type</th><th>Amount</th><th>Remarks</th></tr></thead><tbody></tbody></table><script type="module">
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Building Maintenance Ledger</title><style>body{font-family:Arial;margin:20px;max-width:900px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}input{width:100%}</style></head><body><h2>Building Maintenance Ledger</h2><table>
+<tr>
+    <td>Owner</td>
+    <td>
+        <select id="owner">
+            <option value="">-- Select Owner --</option>
+            <option value="Arpita Chakraborty">Arpita Chakraborty</option>
+            <option value="Owner 2">Arpita Halder</option>
+            <option value="Owner 3">Owner 3</option>
+            <option value="Owner 4">Owner 4</option>
+            <option value="Owner 5">Owner 5</option>
+            <option value="Owner 6">Owner 6</option>
+            <option value="Owner 7">Owner 7</option>
+            <option value="Owner 8">Owner 8</option>
+            <option value="Owner 9">Owner 9</option>
+            <option value="Owner 10">Owner 10</option>
+            <option value="Owner 11">Owner 11</option>
+        </select>
+    </td>
+</tr>
+<tr>
+<td>Date</td>
+
+<td><input id="date" type="date"></td>
+</tr>
+<tr>
+    <td>Flat</td>
+    <td>
+        <select id="flat">
+            <option value="GF1">Select Flat</option>
+        </select>
+    </td>
+</tr>
+
+<tr>
+    <td>Type</td>
+    <td>
+        <select id="type">
+            <option>Maintenance Received</option>
+            <option>Building Expense</option>
+        </select>
+    </td>
+</tr>
+<tr>
+  
+<td>Amount</td>
+<td><input id="amount" type="number"></td></tr>
+<tr><td>Remarks</td><td><input id="remarks"></td></tr></table><button onclick="add()">Add Entry</button>
+<button onclick="download()">Export CSV</button>
+
+<table id="tbl">
+<thead>
+<tr>
+    <th>Owner</th>
+    <th>Date</th>
+    <th>Flat</th>
+    <th>Type</th>
+    <th>Amount</th>
+    <th>Remarks</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table><script type="module">
   
   //firebase initialization
 
@@ -30,6 +92,7 @@ const db = getFirestore(app);
 
   
 async function add() {
+const owner = document.getElementById("owner").value;
 
     const date = document.getElementById("date").value;
     const flat = document.getElementById("flat").value;
@@ -45,16 +108,17 @@ async function add() {
     try {
 
         await addDoc(collection(db, "ledger"), {
-            date: date,
-            flat: flat,
-            type: type,
-            amount: Number(amount),
-            remarks: remarks,
-            createdAt: new Date()
-        });
+    owner: owner,
+    date: date,
+    flat: flat,
+    type: type,
+    amount: Number(amount),
+    remarks: remarks,
+    createdAt: new Date()
+});
 
         alert("Entry added successfully.");
-
+document.getElementById("owner").value = "";
         // Clear the form
         document.getElementById("date").value = "";
         document.getElementById("flat").value = "";
@@ -88,12 +152,13 @@ async function loadLedger() {
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
-                <td>${row.date || ""}</td>
-                <td>${row.flat || ""}</td>
-                <td>${row.type || ""}</td>
-                <td>${row.amount || ""}</td>
-                <td>${row.remarks || ""}</td>
-            `;
+    <td>${row.owner || ""}</td>
+    <td>${row.date || ""}</td>
+    <td>${row.flat || ""}</td>
+    <td>${row.type || ""}</td>
+    <td>${row.amount || ""}</td>
+    <td>${row.remarks || ""}</td>
+`;
 
             tbody.appendChild(tr);
 
@@ -102,6 +167,72 @@ async function loadLedger() {
     } catch (error) {
     console.error(error);
     alert(error.message);
+}
+
+}
+
+async function loadFlats() {
+    const select = document.getElementById("flat");
+    
+    select.innerHTML = '<option value="">Select Flat</option>';
+
+    const snapshot = await getDocs(collection(db, "flats"));
+
+    snapshot.forEach((doc) => {
+        const flat = doc.data();
+
+        const option = document.createElement("option");
+        option.value = flat.floor;
+        option.textContent = flat.floor;
+
+        select.appendChild(option);
+    });
+}
+
+
+
+
+async function download() {
+
+    try {
+
+        const snapshot = await getDocs(collection(db, "ledger"));
+
+        let csv = "Owner,Date,Flat,Type,Amount,Remarks\n";
+        snapshot.forEach((doc) => {
+
+            const row = doc.data();
+
+            csv += `"${row.owner || ""}","${row.date || ""}","${row.flat || ""}","${row.type || ""}","${row.amount || ""}","${row.remarks || ""}"\n`;
+
+        });
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Building_Maintenance_Ledger.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error(error);
+        alert("Failed to export CSV.");
+    }
+
+}
+
+
+window.add = add;
+window.download = download;
+
+loadFlats();
+loadLedger();
+</script></body></html>    alert(error.message);
 }
 
 }
