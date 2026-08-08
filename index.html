@@ -1,106 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<!-- Deployment-ready version: full CSS + embedded building logo -->
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>This Building • Maintenance Ledger</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>This Building - Maintenance Ledger</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="loginPage" class="login-wrap">
+  <div class="login-card">
+    <img src="building.jpg" alt="This Building" class="login-logo">
+    <h1>This Building</h1>
+    <p>Maintenance Ledger</p>
+    <input id="loginEmail" type="email" placeholder="Email" autocomplete="username">
+    <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn" class="login-btn">Login</button>
+    <div id="loginMessage" aria-live="polite"></div>
+  </div>
+</div>
 
-<style>
-*{box-sizing:border-box}
-:root{
-    --primary:#315bea;
-    --primary-dark:#2347c7;
-    --primary-soft:#edf2ff;
-    --accent:#12a875;
-    --accent-soft:#eafaf4;
-    --warning:#f59e0b;
-    --danger:#d64545;
-    --danger-soft:#fff0f0;
-    --bg:#f5f7fb;
-    --card:#fff;
-    --text:#172033;
-    --muted:#667085;
-    --border:#e1e6ef;
-    --shadow:0 8px 28px rgba(25,42,80,.08);
-    --radius:20px;
-}
-html{scroll-behavior:smooth}
-body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    font-size:17px;
-}
-button,input,select{font:inherit}
-button{cursor:pointer}
+<div id="ledgerPage" class="hidden">
+<div class="app">
+  <header class="app-header">
+    <div class="brand">
+      <img src="building.jpg" alt="Building">
+      <div><h1>This Building</h1><p>Maintenance Ledger</p></div>
+    </div>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
 
+  <section class="stats">
+    <div class="stat"><small>Total Maintenance Due</small><strong id="statDue">₹0</strong></div>
+    <div class="stat"><small>Total Received</small><strong id="statPaid">₹0</strong></div>
+    <div class="stat"><small>Outstanding</small><strong id="statOutstanding">₹0</strong></div>
+  </section>
 
-.building-logo{
-    width:96px;height:96px;
-    margin:0 auto 16px;
-    border-radius:22px;
-    object-fit:cover;
-    border:1px solid #e1e6ef;
-    box-shadow:0 8px 20px rgba(25,42,80,.12);
-    display:block;
-}
-.brand-logo{
-    width:54px;height:54px;
-    border-radius:15px;
-    object-fit:cover;
-    border:1px solid #e1e6ef;
-    box-shadow:0 4px 10px rgba(25,42,80,.08);
-}
+  <section class="card" id="entryCard">
+    <div class="card-title"><h2>Add Maintenance Entry</h2></div>
+    <div class="form-grid">
+      <div class="field"><label for="owner">Owner</label><select id="owner"><option value="">-- Select Owner --</option><option>Arpita Chakraborty</option><option>Chandan Kumar</option><option>Sanjay Chanda</option><option>Gita Ganguly</option><option>Arun Kumar Dutta</option><option>Argha Ghosh</option><option>Bhola</option><option>Krishna Halder</option><option>Anil Rudra</option><option>Srijani Nandi</option></select></div>
+      <div class="field"><label for="flat">Flat</label><select id="flat"><option value="">-- Select Flat --</option><option>GF1</option><option>GF2</option><option>GF3</option><option>1stFloor 1</option><option>1stFloor 2</option><option>2ndFloor 1</option><option>2ndFloor 2</option><option>2ndFloor 3</option><option>2ndFloor 4</option><option>3rdFloor 1</option><option>3rdFloor 2</option><option>3rdFloor 3</option></select></div>
+      <div class="field"><label for="maintenanceMonth">Maintenance Month</label><input id="maintenanceMonth" type="month"></div>
+      <div class="field"><label for="date">Date</label><input id="date" type="date"></div>
+      <div class="field"><label for="type">Type</label><select id="type"><option>Maintenance Received</option><option>Building Expense</option></select></div>
+      <div class="field"><label for="maintenanceDue">Maintenance to be Paid</label><input id="maintenanceDue" class="readonly" type="number" readonly></div>
+      <div class="field"><label for="amount">Actually Paid / Expense</label><input id="amount" type="number" min="0" step="0.01" placeholder="Enter amount"></div>
+      <div class="field"><label for="previousBalance">Previous Outstanding</label><input id="previousBalance" class="readonly" type="number" readonly></div>
+      <div class="field"><label for="balance">Current Outstanding</label><input id="balance" class="readonly" type="number" readonly></div>
+      <div class="field full"><label for="remarks">Remarks</label><input id="remarks" type="text" placeholder="Optional remarks"></div>
+    </div>
+    <div class="actions">
+      <button id="addBtn" class="btn btn-primary">Add Entry</button>
+      <button id="exportBtn" class="btn btn-blue">Export CSV</button>
+      <button id="recalcBtn" class="btn btn-light">Recalculate Ledger</button>
+    </div>
+  </section>
 
-/* LOGIN */
-#loginPage{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:
-      radial-gradient(circle at 15% 15%,#dfe8ff 0,transparent 32%),
-      radial-gradient(circle at 85% 85%,#dff8ee 0,transparent 30%),
-      #f7f9fd;
-}
-.login-card{
-    width:min(440px,100%);
-    background:#fff;
-    border-radius:28px;
-    padding:38px 30px;
-    box-shadow:0 18px 55px rgba(31,52,100,.15);
-    text-align:center;
-}
-.login-icon{
-    width:82px;height:82px;margin:0 auto 16px;
-    border-radius:24px;
-    background:linear-gradient(145deg,#e9efff,#f5f7ff);
-    display:flex;align-items:center;justify-content:center;
-    font-size:40px;
-}
-.login-card h1{margin:5px 0 8px;font-size:29px}
-.login-card p.subtitle{color:var(--muted);margin:0 0 25px}
-.login-card input{
-    width:100%;height:58px;margin:7px 0;padding:0 17px;
-    border:1px solid var(--border);border-radius:14px;outline:none;
-}
-.login-card input:focus,.form-control:focus{
-    border-color:var(--primary);
-    box-shadow:0 0 0 4px rgba(49,91,234,.11);
-}
-.login-button{
-    width:100%;height:60px;margin-top:13px;border:0;border-radius:14px;
-    background:linear-gradient(135deg,var(--primary),#5377f2);
-    color:#fff;font-weight:bold;font-size:20px;
-    box-shadow:0 8px 18px rgba(49,91,234,.24);
-}
-.login-button:hover{background:var(--primary-dark)}
-#loginMessage{min-height:24px;margin-top:15px;font-size:15px}
+  <section class="card">
+    <div class="card-title"><h2>Find Records</h2></div>
+    <div class="filter-grid">
+      <div><label for="filterOwner">Owner</label><select id="filterOwner"><option value="">All Owners</option><option>Arpita Chakraborty</option><option>Chandan Kumar</option><option>Sanjay Chanda</option><option>Gita Ganguly</option><option>Arun Kumar Dutta</option><option>Argha Ghosh</option><option>Bhola</option><option>Krishna Halder</option><option>Anil Rudra</option><option>Srijani Nandi</option></select></div>
+      <div><label for="filterYear">Year</label><select id="filterYear"><option value="">All Years</option></select></div>
+      <button id="clearFiltersBtn" class="btn btn-light">Clear Filters</button>
+    </div>
+  </section>
 
-/* APP */
+  <section class="card">
+    <div class="card-title"><h2>Maintenance Records</h2></div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>Owner</th><th>Maintenance Month</th><th>Date</th><th>Flat</th><th>Type</th><th>Maintenance Due</th><th>Actually Paid</th><th>Previous Outstanding</th><th>Current Outstanding</th><th>Remarks</th></tr></thead><tbody id="ledgerBody"></tbody></table></div>
+  </section>
+</div>
+<button id="mobileAdd" class="mobile-add">＋ Add Payment</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const firebaseConfig={apiKey:"AIzaSyBTvD-JiSK6NniNJQrpmecTQk_qbOx3AQk",authDomain:"shivam-maintenance.firebaseapp.com",projectId:"shivam-maintenance",storageBucket:"shivam-maintenance.firebasestorage.app",messagingSenderId:"462528226683",appId:"1:462528226683:web:0acf5da15565a8c8b809de",measurementId:"G-M6PJQB5D1Q"};
+const app=initializeApp(firebaseConfig); const db=getFirestore(app); const auth=getAuth(app);
+const maintenanceStartMonth="2026-01";
+const maintenanceRates={"GF1":310,"GF2":250,"GF3":250,"1stFloor 1":500,"1stFloor 2":500,"2ndFloor 1":295,"2ndFloor 2":275,"2ndFloor 3":300,"2ndFloor 4":260,"3rdFloor 1":495,"3rdFloor 2":500,"3rdFloor 3":500};
+let ledgerRecords=[];
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+function period(s){const [y,m]=s.split("-").map(Number);const [sy,sm]=maintenanceStartMonth.split("-").map(Number);return (y-sy)*12+(m-sm)}
+function paidOf(r){return Number(r.actuallyPaid??r.amount??0)||0}
+
+async function getRecords(){const snap=await getDocs(collection(db,"ledger"));const a=[];snap.forEach(d=>a.push({id:d.id,data:d.data()}));return a}
+async function calculateForm(){
+ const owner=$("owner").value,flat=$("flat").value,month=$("maintenanceMonth").value,paidNow=Number($("amount").value)||0;
+ if(flat) $("maintenanceDue").value=maintenanceRates[flat]||0; else $("maintenanceDue").value="";
+ if(!owner||!flat||!month){$("previousBalance").value="";$("balance").value="";return}
+ const records=await getRecords(),p=period(month),due=maintenanceRates[flat]||0;
+ let before=0,current=0;
+ for(const x of records){const r=x.data;if(r.owner!==owner||r.flat!==flat||r.type!=="Maintenance Received"||!r.maintenanceMonth)continue;const q=period(r.maintenanceMonth);if(q>=0&&q<p)before+=paidOf(r);if(q===p)current+=paidOf(r)}
+ const previous=due*Math.max(p,0)-before; const balance=previous+due-current-paidNow;
+ $("previousBalance").value=previous;$("balance").value=balance;
+}
+async function login(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value,msg=$("loginMessage");if(!email||!password){msg.textContent="Please enter email and password.";return}msg.textContent="Logging in...";try{await signInWithEmailAndPassword(auth,email,password);msg.textContent=""}catch(e){console.error(e);msg.textContent=e.code+" : "+e.message}}
+async function logout(){await signOut(auth)}
+function filtered(){const o=$("filterOwner").value,y=$("filterYear").value;return ledgerRecords.filter(x=>{const r=x.data;return(!o||r.owner===o)&&(!y||String(r.maintenanceMonth||"").startsWith(y))})}
+function display(records){const body=$("ledgerBody");body.innerHTML="";if(!records.length){body.innerHTML='<tr><td colspan="10" class="empty">No records found</td></tr>';return}for(const x of records){const r=x.data,tr=document.createElement("tr");tr.innerHTML=`<td>${esc(r.owner)}</td><td>${esc(r.maintenanceMonth)}</td><td>${esc(r.date)}</td><td>${esc(r.flat)}</td><td>${esc(r.type)}</td><td>${r.type==="Maintenance Received"?money(r.maintenanceDue):""}</td><td class="amount">${r.type==="Maintenance Received"?money(r.actuallyPaid??r.amount):money(r.amount)}</td><td>${r.type==="Maintenance Received"?money(r.previousBalance):""}</td><td class="${Number(r.balance||0)>0?'outstanding':'positive'}">${r.type==="Maintenance Received"?money(r.balance):""}</td><td>${esc(r.remarks)}</td>`;body.appendChild(tr)}}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function updateStats(){let due=0,paid=0;for(const x of filtered()){const r=x.data;if(r.type==="Maintenance Received"){due+=Number(r.maintenanceDue||0);paid+=paidOf(r)}}$("statDue").textContent=money(due);$("statPaid").textContent=money(paid);$("statOutstanding").textContent=money(due-paid)}
+function applyFilter(){display(filtered());updateStats()}
+async function loadLedger(){ledgerRecords=await getRecords();const ys=new Set();for(const x of ledgerRecords)if(x.data.maintenanceMonth)ys.add(x.data.maintenanceMonth.slice(0,4));const sel=$("filterYear");sel.innerHTML='<option value="">All Years</option>';[...ys].sort().reverse().forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y;sel.appendChild(o)});applyFilter()}
+async function addEntry(){const owner=$("owner").value,flat=$("flat").value,month=$("maintenanceMonth").value,date=$("date").value,type=$("type").value,amount=Number($("amount").value)||0,remarks=$("remarks").value.trim();if(!owner||!flat||!month||!date||amount<=0){alert("Please select Owner, Flat, Maintenance Month, Date and enter an amount.");return}try{const existing=await getRecords();if(type==="Maintenance Received"&&existing.some(x=>x.data.owner===owner&&x.data.flat===flat&&x.data.type===type&&x.data.maintenanceMonth===month)){if(!confirm("A maintenance entry already exists for this Owner, Flat and Month. Add another payment?"))return}
+let previous=0,balance=0;if(type==="Maintenance Received"){const p=period(month),due=maintenanceRates[flat]||0;let before=0,current=0;for(const x of existing){const r=x.data;if(r.owner!==owner||r.flat!==flat||r.type!=="Maintenance Received"||!r.maintenanceMonth)continue;const q=period(r.maintenanceMonth);if(q>=0&&q<p)before+=paidOf(r);if(q===p)current+=paidOf(r)}previous=due*Math.max(p,0)-before;balance=previous+due-current-amount}
+await addDoc(collection(db,"ledger"),{owner,maintenanceMonth:month,date,flat,type,amount,maintenanceDue:maintenanceRates[flat]||0,actuallyPaid:type==="Maintenance Received"?amount:0,previousBalance:previous,balance,remarks,createdAt:new Date()});alert("Entry added successfully.");["owner","maintenanceMonth","date","flat","amount","remarks","maintenanceDue","previousBalance","balance"].forEach(id=>$(id).value="");await loadLedger()}catch(e){console.error(e);alert("Failed to add entry: "+e.message)}}
+async function recalculateLedger(){if(!confirm("This will recalculate all maintenance outstanding balances from January 2026. Continue?"))return;try{const records=await getRecords();const start=maintenanceStartMonth;for(const x of records){const r=x.data;if(r.type!=="Maintenance Received"||!r.owner||!r.flat||!r.maintenanceMonth)continue;const p=period(r.maintenanceMonth);if(p<0)continue;const due=maintenanceRates[r.flat]||0;let before=0,through=0;for(const y of records){const q=y.data;if(q.owner!==r.owner||q.flat!==r.flat||q.type!=="Maintenance Received"||!q.maintenanceMonth)continue;const z=period(q.maintenanceMonth);if(z>=0&&z<p)before+=paidOf(q);if(z>=0&&z<=p)through+=paidOf(q)}await updateDoc(doc(db,"ledger",x.id),{maintenanceDue:due,previousBalance:due*p-before,balance:due*(p+1)-through})}alert("Ledger recalculated successfully.");await loadLedger()}catch(e){console.error(e);alert("Failed to recalculate ledger: "+e.message)}}
+function download(){const rows=filtered(),headers=["Owner","Maintenance Month","Date","Flat","Type","Maintenance Due","Actually Paid","Previous Outstanding","Current Outstanding","Remarks"];const field=v=>'"'+String(v??"").replace(/"/g,'""')+'"';let csv="\uFEFF"+headers.map(field).join(",")+"\n";for(const x of rows){const r=x.data;csv+=[r.owner,r.maintenanceMonth,r.date,r.flat,r.type,r.type==="Maintenance Received"?r.maintenanceDue:"",r.type==="Maintenance Received"?(r.actuallyPaid??r.amount):r.amount,r.type==="Maintenance Received"?r.previousBalance:"",r.type==="Maintenance Received"?r.balance:"",r.remarks].map(field).join(",")+"\n"}const blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Building_Maintenance_Ledger.csv";a.click();URL.revokeObjectURL(url)}
+
+$("loginBtn").addEventListener("click",login);$("logoutBtn").addEventListener("click",logout);$("addBtn").addEventListener("click",addEntry);$("exportBtn").addEventListener("click",download);$("recalcBtn").addEventListener("click",recalculateLedger);$("clearFiltersBtn").addEventListener("click",()=>{$("filterOwner").value="";$('filterYear').value="";applyFilter()});$("filterOwner").addEventListener("change",applyFilter);$("filterYear").addEventListener("change",applyFilter);$("owner").addEventListener("change",calculateForm);$("flat").addEventListener("change",calculateForm);$("maintenanceMonth").addEventListener("change",calculateForm);$("amount").addEventListener("input",calculateForm);$("type").addEventListener("change",()=>{if($("type").value==="Building Expense"){$("previousBalance").value="";$('balance').value=""}else calculateForm()});$("mobileAdd").addEventListener("click",()=>{$("entryCard").scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("owner").focus(),350)});
+
+onAuthStateChanged(auth,async user=>{if(user){$("loginPage").classList.add("hidden");$("ledgerPage").classList.remove("hidden");try{await loadLedger()}catch(e){alert(e.message)}}else{$("ledgerPage").classList.add("hidden");$("loginPage").classList.remove("hidden")}});
+</script>
+</body>
+</html>
 #ledgerPage{max-width:1200px;margin:auto;padding:16px}
 .app-header{
     background:linear-gradient(135deg,#fff,#f8faff);
