@@ -3861,53 +3861,53 @@ async function loadExpenses() {
             return;
         }
 
-        snapshot.forEach((document) => {
+        snapshot.forEach((expenseDoc) => {
 
-            const row =
-                document.data();
+    const row =
+        expenseDoc.data();
 
-            const amountToBePaid =
-                Number(row.amountToBePaid) || 0;
+    const amountToBePaid =
+        Number(row.amountToBePaid) || 0;
 
-            const actualAmountPaid =
-                Number(row.actualAmountPaid) || 0;
+    const actualAmountPaid =
+        Number(row.actualAmountPaid) || 0;
 
-            totalToBePaid +=
-                amountToBePaid;
+    totalToBePaid +=
+        amountToBePaid;
 
-            totalActuallyPaid +=
-                actualAmountPaid;
+    totalActuallyPaid +=
+        actualAmountPaid;
 
-            const tr =
-                document.createElement("tr");
+    const tr =
+        document.createElement("tr");
 
-            tr.innerHTML = `
+    tr.innerHTML = `
 
-                <td>
-                    ${row.expenseType || ""}
-                </td>
+        <td>
+            ${row.expenseType || ""}
+        </td>
 
-                <td>
-                    ${row.owner || ""}
-                </td>
+        <td>
+            ${row.owner || ""}
+        </td>
 
-                <td>
-                    ₹${amountToBePaid}
-                </td>
+        <td>
+            ₹${amountToBePaid}
+        </td>
 
-                <td>
-                    ₹${actualAmountPaid}
-                </td>
+        <td>
+            ₹${actualAmountPaid}
+        </td>
 
-                <td>
-                    ₹${amountToBePaid - actualAmountPaid}
-                </td>
+        <td>
+            ₹${amountToBePaid - actualAmountPaid}
+        </td>
 
-            `;
+    `;
 
-            tbody.appendChild(tr);
+    tbody.appendChild(tr);
 
-        });
+});
 
 
         // Total row
