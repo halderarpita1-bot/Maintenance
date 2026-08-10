@@ -269,7 +269,13 @@
 
 </div>
 
-<div id="ledgerPage" style="display:none;">  <button onclick="logout()">Logout</button>
+<div id="ledgerPage" style="display:none;">
+
+    <button onclick="logout()">Logout</button>
+
+    <button onclick="closeMaintenancePage()">
+        Back to Home
+    </button>
 <br><br>
 
   <table>  <tr>  
@@ -3127,6 +3133,13 @@ function openMaintenancePage() {
 
     loadLedger();
 }
+function closeMaintenancePage() {
+
+    document.getElementById("ledgerPage").style.display = "none";
+
+    document.getElementById("homePage").style.display = "block";
+
+}
 function openExpensePage() {
 
     document.getElementById("homePage").style.display = "none";
@@ -3176,6 +3189,7 @@ function calculateBalanceSheet() {
 }
 window.login = login;
 window.openMaintenancePage = openMaintenancePage;
+window.closeMaintenancePage = closeMaintenancePage;
 window.openExpensePage = openExpensePage;
 window.openBalanceSheetPage = openBalanceSheetPage;
 window.closeBalanceSheetPage = closeBalanceSheetPage;
@@ -3245,4 +3259,4 @@ onAuthStateChanged(auth, (user) => {
 //loadLedger();
 </script>
 </body>
-</html>
+    </html>
