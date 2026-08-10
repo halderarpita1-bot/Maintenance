@@ -42,7 +42,51 @@
 <p id="loginMessage"></p>
 
 </div>
+<!-- HOME PAGE -->
 
+<div id="homePage" style="display:none;">
+
+    <h2>Building Maintenance Management System</h2>
+
+    <p>Please select what you want to do:</p>
+
+    <button onclick="openMaintenancePage()">
+        1. Add Maintenance Entry
+    </button>
+
+    <br><br>
+
+    <button onclick="openExpensePage()">
+        2. Add Building Expense
+    </button>
+
+    <br><br>
+
+    <button onclick="openBalanceSheetPage()">
+        3. Calculate Monthly Balance Sheet
+    </button>
+
+    <br><br>
+
+    <button onclick="logout()">
+        Logout
+    </button>
+
+</div>
+
+<!-- BUILDING EXPENSE PAGE -->
+
+<div id="expensePage" style="display:none;">
+
+    <h2>Building Expenses</h2>
+
+    <p>Enter building-related expenses.</p>
+
+    <button onclick="closeExpensePage()">
+        Back to Home
+    </button>
+
+</div>
 <!-- PENDING MAINTENANCE PAGE -->
 
 <div id="pendingPage" style="display:none;">
@@ -520,10 +564,8 @@ try {
 
     message.textContent = "Login successful!";  
 
-    document.getElementById("loginPage").style.display = "none";  
-    document.getElementById("ledgerPage").style.display = "block";  
-
-    await loadLedger();  
+    document.getElementById("loginPage").style.display = "none";
+document.getElementById("homePage").style.display = "block"; 
 
 } catch (error) {  
 
@@ -3008,8 +3050,32 @@ function closePendingPage() {
     document.getElementById("ledgerPage").style.display = "block";
 
 }
+function openMaintenancePage() {
 
+    document.getElementById("homePage").style.display = "none";
+
+    document.getElementById("ledgerPage").style.display = "block";
+
+    loadLedger();
+}
+function openExpensePage() {
+
+    document.getElementById("homePage").style.display = "none";
+
+    document.getElementById("expensePage").style.display = "block";
+
+}
+function closeExpensePage() {
+
+    document.getElementById("expensePage").style.display = "none";
+
+    document.getElementById("homePage").style.display = "block";
+
+}
 window.login = login;
+window.openMaintenancePage = openMaintenancePage;
+window.openExpensePage = openExpensePage;
+window.closeExpensePage = closeExpensePage;
 window.openPendingPage = openPendingPage;
 window.closePendingPage = closePendingPage;
 window.logout = logout;
