@@ -75,18 +75,240 @@
 </div>
 
 <!-- BUILDING EXPENSE PAGE -->
+<!-- BUILDING EXPENSE PAGE -->
 
 <div id="expensePage" style="display:none;">
 
     <button onclick="logout()">Logout</button>
 
-    <h2>Building Expenses</h2>
-
-    <p>Enter building-related expenses.</p>
-
     <button onclick="closeExpensePage()">
         Back to Home
     </button>
+
+    <h2>Building Expenses</h2>
+
+    <h3>Enter Building Expense</h3>
+
+    <table>
+
+        <tr>
+            <td><strong>Expense Type</strong></td>
+
+            <td>
+                <select id="expenseType">
+
+                    <option value="">
+                        -- Select Expense Type --
+                    </option>
+
+                    <option value="Plumbing">
+                        Plumbing
+                    </option>
+
+                    <option value="Electrical">
+                        Electrical
+                    </option>
+
+                    <option value="Painting">
+                        Painting
+                    </option>
+
+                    <option value="Repair">
+                        Repair
+                    </option>
+
+                    <option value="Cleaning">
+                        Cleaning
+                    </option>
+
+                    <option value="Lift">
+                        Lift
+                    </option>
+
+                    <option value="Water">
+                        Water
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td><strong>Owner</strong></td>
+
+            <td>
+                <select id="expenseOwner">
+
+                    <option value="">
+                        -- Select Owner --
+                    </option>
+
+                    <option value="Argha Ghosh">
+                        Argha Ghosh
+                    </option>
+
+                    <option value="Bhola">
+                        Bhola
+                    </option>
+
+                    <option value="Amal Sur">
+                        Amal Sur
+                    </option>
+
+                    <option value="Gita Ganguly">
+                        Gita Ganguly
+                    </option>
+
+                    <option value="Krishna Halder">
+                        Krishna Halder
+                    </option>
+
+                    <option value="Anil Rudra">
+                        Anil Rudra
+                    </option>
+
+                    <option value="Srijani Nandi">
+                        Srijani Nandi
+                    </option>
+
+                    <option value="Roma Singha">
+                        Roma Singha
+                    </option>
+
+                    <option value="Sanjay Chanda">
+                        Sanjay Chanda
+                    </option>
+
+                    <option value="Chandan Kumar">
+                        Chandan Kumar
+                    </option>
+
+                    <option value="Arpita Chakraborty">
+                        Arpita Chakraborty
+                    </option>
+
+                    <option value="Arun Kumar Dutta">
+                        Arun Kumar Dutta
+                    </option>
+
+                    <option value="Dummy Owner1">
+                        Dummy Owner1
+                    </option>
+
+                    <option value="Dummy Owner2">
+                        Dummy Owner2
+                    </option>
+
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td><strong>Amount to be Paid</strong></td>
+
+            <td>
+                <input
+                    id="expenseDue"
+                    type="number"
+                    min="0"
+                    placeholder="Enter amount">
+            </td>
+        </tr>
+
+        <tr>
+            <td><strong>Actual Amount Paid</strong></td>
+
+            <td>
+                <input
+                    id="expensePaid"
+                    type="number"
+                    min="0"
+                    placeholder="Enter actual amount paid">
+            </td>
+        </tr>
+
+        <tr>
+            <td><strong>Remarks</strong></td>
+
+            <td>
+                <input
+                    id="expenseRemarks"
+                    type="text"
+                    placeholder="Optional">
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <button onclick="addBuildingExpense()">
+        Add Expense
+    </button>
+
+    <button onclick="clearExpenseForm()">
+        Clear
+    </button>
+
+    <h3>Building Expense Summary</h3>
+
+    <table id="expenseSummaryTable">
+
+        <thead>
+
+            <tr>
+                <th>Expense Type</th>
+                <th>Owner</th>
+                <th>Amount to be Paid</th>
+                <th>Actual Amount Paid</th>
+                <th>Difference</th>
+                <th>Remarks</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td colspan="6"
+                    style="text-align:center;">
+                    No building expenses entered.
+                </td>
+            </tr>
+
+        </tbody>
+
+        <tfoot>
+
+            <tr>
+
+                <th colspan="2">
+                    Total
+                </th>
+
+                <th id="expenseTotalDue">
+                    ₹0
+                </th>
+
+                <th id="expenseTotalPaid">
+                    ₹0
+                </th>
+
+                <th id="expenseTotalDifference">
+                    ₹0
+                </th>
+
+                <th></th>
+
+            </tr>
+
+        </tfoot>
+
+    </table>
 
 </div>
 
@@ -102,6 +324,3435 @@
         Select the month to calculate the building's
         maintenance balance.
     </p>
+
+    <label>
+        <strong>Month:</strong>
+    </label>
+
+    <input id="balanceSheetMonth" type="month">
+
+    <br><br>
+
+    <button onclick="calculateBalanceSheet()">
+        Calculate Balance Sheet
+    </button>
+
+    <button onclick="closeBalanceSheetPage()">
+        Back to Home
+    </button>
+
+    <br><br>
+
+    <table id="balanceSheetTable">
+
+        <thead>
+            <tr>
+                <th>Particular</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    Select a month and click Calculate Balance Sheet.
+                </td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+<!-- PENDING MAINTENANCE PAGE -->
+
+<div id="pendingPage" style="display:none;">
+
+    <button onclick="logout()">Logout</button>
+
+    <h2>Pending Maintenance</h2>
+
+    <p>
+        Calculate total pending maintenance
+        from the selected month through the current month.
+    </p>
+
+    <table>
+
+        <tr>
+            <td><strong>Owner</strong></td>
+            <td>
+                <select id="pendingOwner">
+
+                    <option value="">-- Select Owner --</option>
+
+                          
+<option value="Argha Ghosh">Argha Ghosh</option>
+<option value="Bhola">Bhola</option>
+<option value="Amal Sur">Amal Sur</option>
+       
+<option value="Gita Ganguly">Gita Ganguly</option>
+<option value="Krishna Halder">Krishna Halder</option>
+<option value="Anil Rudra">Anil Rudra</option>
+        
+<option value="Srijani Nandi">Srijani Nandi</option>
+<option value="Roma Singha">Roma Singha</option>
+ <option value="Sanjay Chanda">Sanjay Chanda</option>
+<option value="Chandan Kumar">Chandan Kumar</option>
+       
+<option value="Arpita Chakraborty">Arpita Chakraborty</option>
+<option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
+
+       
+<option value="Dummy Owner1">Dummy Owner1</option>
+<option value="Dummy Owner2">Dummy Owner2</option>
+
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td><strong>Starting Year</strong></td>
+            <td>
+                <select id="pendingYear">
+                    <option value="">-- Select Year --</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td><strong>Starting Month</strong></td>
+            <td>
+                <select id="pendingMonth">
+
+                    <option value="">-- Select Month --</option>
+
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+
+                </select>
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <button onclick="calculatePendingSummary()">
+        Calculate Pending Maintenance
+    </button>
+
+    <button onclick="closePendingPage()">
+        Back to Ledger
+    </button>
+
+    <h3>Pending Maintenance Result</h3>
+
+    <table id="pendingResultTable">
+
+        <thead>
+            <tr>
+                <th>Owner</th>
+                <th>Flat</th>
+                <th>Monthly Maintenance</th>
+                <th>Period</th>
+                <th>Total Due</th>
+                <th>Total Paid</th>
+                <th>Pending Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td colspan="7" style="text-align:center;">
+                    Select Owner, Starting Year and Starting Month,
+                    then click Calculate Pending Maintenance.
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+<div id="ledgerPage" style="display:none;">
+
+    <button onclick="logout()">Logout</button>
+
+    <button onclick="closeMaintenancePage()">
+        Back to Home
+    </button>
+<br><br>
+
+  <table>  <tr>  
+    <td>Owner</td>  
+    <td>  
+       <select id="owner" onchange="ownerSelected()">
+            <option value="">-- Select Owner --</option>  
+            
+<option value="Argha Ghosh">Argha Ghosh</option>
+<option value="Bhola">Bhola</option>
+<option value="Amal Sur">Amal Sur</option>
+       
+<option value="Gita Ganguly">Gita Ganguly</option>
+<option value="Krishna Halder">Krishna Halder</option>
+<option value="Anil Rudra">Anil Rudra</option>
+        
+<option value="Srijani Nandi">Srijani Nandi</option>
+<option value="Roma Singha">Roma Singha</option>
+ <option value="Sanjay Chanda">Sanjay Chanda</option>
+<option value="Chandan Kumar">Chandan Kumar</option>
+       
+<option value="Arpita Chakraborty">Arpita Chakraborty</option>
+<option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
+
+       
+<option value="Dummy Owner1">Dummy Owner1</option>
+
+       
+<option value="Dummy Owner2">Dummy Owner2</option>
+
+</select>  
+</td>
+</tr>  
+<tr>  
+    <td>Maintenance Month</td>  
+    <td>  
+        <input id="maintenanceMonth" type="month">  
+    </td>  
+</tr>  <tr>  
+    <td>Date</td>  
+    <td>  
+        <input id="date" type="date">  
+    </td>  
+</tr>  
+<tr>  
+    <td>Flat</td>  
+    <td>  
+        <select id="flat" onchange="flatSelected()">  <option value="">-- Select flat--</option>
+
+ <option value="GF1">GF1</option>  
+ <option value="GF2">GF2</option>  
+ <option value="GF3">GF3</option>  
+ <option value="1stFloor 1">1stFloor 1</option>  
+ <option value="1stFloor 2">1stFloor 2</option>   
+ <option value="1stFloor 3">1stFloor 3</option>   
+ <option value="2ndFloor 1">2ndFloor 1</option>  
+<option value="2ndFloor 2">2ndFloor 2</option>  
+<option value="2ndFloor 3">2ndFloor 3</option>  
+<option value="2ndFloor 4">2ndFloor 4</option>  
+<option value="3rdFloor 1">3rdFloor 1</option>  
+<option value="3rdFloor 2">3rdFloor 2</option>  
+
+<option value="Dummy Flat1">Dummy Flat1</option>
+<option value="Dummy Flat2">Dummy Flat2</option>
+
+        </select>  
+    </td>  
+</tr>  <tr>  
+    <td>Type</td>  
+    <td>  
+        <select id="type">  
+            <option>Maintenance Received</option>  
+            <option>Building Expense</option>  </select>  
+</td>
+
+</tr>  
+<tr>  
+    <td>Maintenance to be Paid</td>  
+    <td>  
+        <input id="maintenanceDue" type="number" readonly>  
+    </td>  
+</tr>  <tr>  
+    <td>Actually Paid</td>  
+    <td>  
+        <input id="amount"  
+               type="number"  
+               placeholder="Enter amount actually paid"  
+               oninput="calculateCurrentBalance()">  
+    </td>  
+</tr>  <tr>  
+    <td>Previous Outstanding</td>  
+    <td>  
+        <input id="previousBalance" type="number" readonly>  
+    </td>  
+</tr>  <tr>  
+    <td>Current Outstanding</td>  
+    <td>  
+        <input id="balance" type="number" readonly>  
+    </td>  
+</tr>  <tr>  
+    <td>Remarks</td>  
+    <td>  
+        <input id="remarks">  
+    </td>  
+</tr>  
+</table><button onclick="add()">Add Entry</button>
+<button id="saveEditButton"
+        onclick="saveEditedEntry()"
+        style="display:none;">
+    Save Changes
+</button>
+<button onclick="download()">Export CSV</button>
+<button onclick="recalculateLedger()">Recalculate Ledger</button>
+
+<button onclick="openPendingPage()">
+    Pending Maintenance
+</button>
+
+<div style="margin:15px 0;">
+
+    <label>
+        <strong>Filter Owner:</strong>
+    </label>
+
+    <select id="filterOwner" onchange="filterLedger()">
+        <option value="">All Owners</option>
+
+            
+<option value="Argha Ghosh">Argha Ghosh</option>
+<option value="Bhola">Bhola</option>
+<option value="Amal Sur">Amal Sur</option>
+       
+<option value="Gita Ganguly">Gita Ganguly</option>
+<option value="Krishna Halder">Krishna Halder</option>
+<option value="Anil Rudra">Anil Rudra</option>
+        
+<option value="Srijani Nandi">Srijani Nandi</option>
+<option value="Roma Singha">Roma Singha</option>
+ <option value="Sanjay Chanda">Sanjay Chanda</option>
+<option value="Chandan Kumar">Chandan Kumar</option>
+       
+<option value="Arpita Chakraborty">Arpita Chakraborty</option>
+<option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
+
+<option value="Dummy Owner1">Dummy Owner1</option>
+<option value="Dummy Owner2">Dummy Owner2</option>
+    </select>
+
+
+    <label style="margin-left:15px;">
+        <strong>Filter Year:</strong>
+    </label>
+
+    <select id="filterYear" onchange="filterLedger()">
+        <option value="">All Years</option>
+    </select>
+    <button onclick="clearFilters()">
+        Clear Filters
+    </button>
+
+</div>
+<table id="tbl">  
+<thead>  
+<tr>  
+  <th>Owner</th>  
+  <th>Maintenance Month</th>  
+  <th>Date</th>  
+  <th>Flat</th>  
+<th>Type</th>  
+<th>Maintenance Due</th>  
+<th>Actually Paid</th>  
+<th>Previous Outstanding</th>  
+
+<th>Current Outstanding</th>
+<th>Remarks</th>
+<th>Actions</th>
+</tr>  
+</thead>  
+<tbody></tbody>  
+</table>
+
+<script type="module">  //firebase initialization
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    updateDoc,
+    deleteDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import {
+getAuth,
+signInWithEmailAndPassword,
+signOut,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyBTvD-JiSK6NniNJQrpmecTQk_qbOx3AQk",
+authDomain: "shivam-maintenance.firebaseapp.com",
+projectId: "shivam-maintenance",
+storageBucket: "shivam-maintenance.firebasestorage.app",
+messagingSenderId: "462528226683",
+appId: "1:462528226683:web:0acf5da15565a8c8b809de",
+measurementId: "G-M6PJQB5D1Q"
+};
+
+// Connect to Firebase
+const app = initializeApp(firebaseConfig);
+
+// Connect to Firestore
+const db = getFirestore(app);
+//Connect to Firebase authentication
+const auth = getAuth(app);
+// Monthly maintenance amount for each flat
+// CHANGE THESE AMOUNTS TO YOUR ACTUAL AMOUNTS
+const ADMIN_EMAIL = "admin@buildingledger.com";
+let editingRecordId = null;
+const maintenanceRates = {
+
+"GF1": 310,  
+"GF2": 250,  
+"GF3": 250,  
+
+"1stFloor 1": 500,  
+"1stFloor 2": 500, 
+"1stFloor 3": 600,
+
+"2ndFloor 1": 295,  
+"2ndFloor 2": 275,  
+"2ndFloor 3": 300,  
+"2ndFloor 4": 260,  
+
+"3rdFloor 1": 495,  
+"3rdFloor 2": 600,  
+
+"Dummy Flat1": 100,
+"Dummy Flat2": 110,
+
+
+};
+const ownerFlats = {
+
+
+    
+    "Argha Ghosh": ["GF1"],
+    "Bhola": ["GF2"],
+    "Amal Sur": ["GF3"],
+
+
+    "Gita Ganguly": ["1stFloor 1"],
+    "Anil Rudra": ["1stFloor 2"],
+    "Krishna Halder": ["1stFloor 3"],
+
+    "Srijani Nandi": ["2ndFloor 1"],
+    "Roma Singha" : ["2ndFloor 2"],
+    "Sanjay Chanda": ["2ndFloor 3"],
+    "Chandan Kumar": ["2ndFloor 4"],
+
+    "Arpita Chakraborty": ["3rdFloor 1"],
+    "Arun Kumar Dutta": ["3rdFloor 2"],
+     "Dummy Owner1" : ["Dummy Flat1"],
+     "Dummy Owner2" : ["Dummy Flat2"]
+
+};
+function ownerSelected() {
+
+    const owner =
+        document.getElementById("owner").value;
+
+    const flatSelect =
+        document.getElementById("flat");
+
+    // Clear existing flat options
+
+    flatSelect.innerHTML =
+        '<option value="">-- Select Flat --</option>';
+
+    if (!owner) {
+
+        return;
+    }
+
+    const flats =
+        ownerFlats[owner] || [];
+
+    flats.forEach((flat) => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = flat;
+        option.textContent = flat;
+
+        flatSelect.appendChild(option);
+
+    });
+
+    // Automatically select if the owner has only one flat
+
+    if (flats.length === 1) {
+
+        flatSelect.value = flats[0];
+
+        // Trigger your existing flat calculation
+
+        flatSelected();
+    }
+}
+function getMaintenanceStart() {
+
+    const currentYear =
+        new Date().getFullYear();
+
+    return {
+        startYear: currentYear,
+        startMonth: 1
+    };
+}
+// Maintenance calculation starts from January
+// of the current calendar year automatically.
+
+// Maintenance calculation starts from January 2026.
+
+async function login() {
+
+const email = document.getElementById("loginEmail").value.trim();  
+const password = document.getElementById("loginPassword").value;  
+const message = document.getElementById("loginMessage");  
+
+message.textContent = "Logging in...";  
+
+if (!email || !password) {  
+    message.textContent = "Please enter email and password.";  
+    return;  
+}  
+
+try {  
+
+    const userCredential = await signInWithEmailAndPassword(  
+        auth,  
+        email,  
+        password  
+    );  
+
+    console.log("Login successful:", userCredential.user.email);  
+
+    message.textContent = "Login successful!";  
+
+    document.getElementById("loginPage").style.display = "none";
+document.getElementById("homePage").style.display = "block"; 
+
+} catch (error) {  
+
+    console.error("LOGIN ERROR:", error);  
+
+    message.textContent =  
+        error.code + " : " + error.message;  
+}
+
+}
+async function logout() {
+
+    try {
+
+        await signOut(auth);
+
+        // Hide every application page
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("ledgerPage").style.display = "none";
+        document.getElementById("expensePage").style.display = "none";
+        document.getElementById("pendingPage").style.display = "none";
+document.getElementById("balanceSheetPage").style.display = "none";
+        // Show ONLY the login page
+        document.getElementById("loginPage").style.display = "block";
+
+        // Clear login fields
+        document.getElementById("loginEmail").value = "";
+        document.getElementById("loginPassword").value = "";
+        document.getElementById("loginMessage").textContent = "";
+
+        // Reset admin status
+        window.isAdmin = false;
+
+    } catch (error) {
+
+        console.error("LOGOUT ERROR:", error);
+
+        alert("Logout failed: " + error.message);
+
+    }
+
+}
+
+function flatSelected() {
+
+const flat = document.getElementById("flat").value;  
+
+if (!flat) {  
+    document.getElementById("maintenanceDue").value = "";  
+    document.getElementById("previousBalance").value = "";  
+    document.getElementById("balance").value = "";  
+    return;  
+}  
+
+const due = maintenanceRates[flat] || 0;  
+
+document.getElementById("maintenanceDue").value = due;  
+
+calculatePreviousBalance();
+
+}
+
+async function calculatePreviousBalance() {
+
+    const owner =
+        document.getElementById("owner").value;
+
+    const flat =
+        document.getElementById("flat").value;
+
+    const maintenanceMonth =
+        document.getElementById("maintenanceMonth").value;
+
+
+    if (!owner || !flat || !maintenanceMonth) {
+
+        document.getElementById("previousBalance").value = "";
+        document.getElementById("balance").value = "";
+
+        return;
+    }
+
+
+    try {
+
+        const [year, month] =
+            maintenanceMonth
+                .split("-")
+                .map(Number);
+
+
+        const monthlyDue =
+            maintenanceRates[flat] || 0;
+
+
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+
+        const records = [];
+
+
+        snapshot.forEach((document) => {
+
+            const row =
+                document.data();
+
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received" &&
+                row.maintenanceMonth
+            ) {
+
+                records.push(row);
+
+            }
+
+        });
+
+
+        /*
+         * Find the first recorded year.
+         */
+
+        /*
+ * STEP 9:
+ * Maintenance calculation starts from
+ * January of the current year.
+ */
+
+const { startYear, startMonth } =
+    getMaintenanceStart();
+
+        /*
+         * Number of months before
+         * the selected month.
+         */
+
+        const monthsBeforeCurrent =
+    (
+        (year - startYear) * 12
+    ) +
+    (month - startMonth);
+
+
+        /*
+         * Maintenance due before
+         * the selected month.
+         */
+
+        const totalDueBeforeCurrent =
+            monthlyDue *
+            Math.max(
+                monthsBeforeCurrent,
+                0
+            );
+
+
+        /*
+         * Calculate all payments
+         * before the selected month.
+         */
+
+        let totalPaidBeforeCurrentMonth = 0;
+
+
+        records.forEach((row) => {
+
+            const [rowYear, rowMonth] =
+                row.maintenanceMonth
+                    .split("-")
+                    .map(Number);
+
+
+const rowPeriod =
+    (
+        (rowYear - startYear) * 12
+    ) +
+    (rowMonth - startMonth);
+
+
+const currentPeriod =
+    (
+        (year - startYear) * 12
+    ) +
+    (month - startMonth);
+                
+
+
+            if (rowPeriod >= 0 && rowPeriod < currentPeriod) {
+
+    const paid =
+        Number(
+            row.actuallyPaid ??
+            row.amount ??
+            0
+        );
+
+    totalPaidBeforeCurrentMonth +=
+        paid;
+
+}
+
+        });
+
+
+        /*
+         * Previous Outstanding
+         */
+
+        const previousBalance =
+            totalDueBeforeCurrent -
+            totalPaidBeforeCurrentMonth;
+
+
+        /*
+         * Current month's maintenance
+         */
+
+        const currentBalanceBeforePayment =
+            previousBalance +
+            monthlyDue;
+
+
+        document.getElementById("previousBalance").value =
+            previousBalance;
+
+
+        document.getElementById("balance").value =
+            currentBalanceBeforePayment;
+
+
+        /*
+         * Recalculate after loading
+         * the previous balance.
+         */
+
+        await calculateCurrentBalance();
+
+
+    } catch (error) {
+
+        console.error(
+            "PREVIOUS BALANCE ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to calculate outstanding: " +
+            error.message
+        );
+
+    }
+
+}
+
+// Recalculate when owner changes
+document.getElementById("owner")
+.addEventListener("change", calculatePreviousBalance);
+
+// Recalculate when maintenance month changes
+document.getElementById("maintenanceMonth")
+.addEventListener("change", calculatePreviousBalance);
+
+async function calculateCurrentBalance() {
+
+    const owner =
+        document.getElementById("owner").value;
+
+    const flat =
+        document.getElementById("flat").value;
+
+    const maintenanceMonth =
+        document.getElementById("maintenanceMonth").value;
+
+    const paidNow =
+        Number(
+            document.getElementById("amount").value
+        ) || 0;
+
+
+    if (!owner || !flat || !maintenanceMonth) {
+
+        document.getElementById("balance").value = "";
+
+        return;
+
+    }
+
+
+    try {
+
+        const [year, month] =
+            maintenanceMonth
+                .split("-")
+                .map(Number);
+
+
+        const monthlyDue =
+            maintenanceRates[flat] || 0;
+
+
+        /*
+         * Previous Outstanding has already
+         * been calculated.
+         */
+
+        const previousBalance =
+            Number(
+                document.getElementById("previousBalance").value
+            ) || 0;
+
+
+        /*
+         * Find payments already received
+         * for the selected maintenance month.
+         */
+
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+
+        let paidInCurrentMonth = 0;
+
+
+        snapshot.forEach((document) => {
+
+            const row =
+                document.data();
+
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received" &&
+                row.maintenanceMonth === maintenanceMonth
+            ) {
+
+                const paid =
+                    Number(
+                        row.actuallyPaid ??
+                        row.amount ??
+                        0
+                    );
+
+
+                paidInCurrentMonth +=
+                    paid;
+
+            }
+
+        });
+
+
+        /*
+         * Current Outstanding =
+         *
+         * Previous Outstanding
+         * + Current Month Due
+         * - Existing Current Month Payments
+         * - New Payment
+         */
+
+        const currentBalance =
+            previousBalance +
+            monthlyDue -
+            paidInCurrentMonth -
+            paidNow;
+
+
+        document.getElementById("balance").value =
+            currentBalance;
+
+
+    } catch (error) {
+
+        console.error(
+            "CURRENT BALANCE ERROR:",
+            error
+        );
+
+    }
+
+}
+
+async function recalculateLedger() {
+
+    if (!confirm(
+        "This will recalculate Previous Outstanding and Current Outstanding for all maintenance records. Continue?"
+    )) {
+        return;
+    }
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+        /*
+         * Convert Firestore documents
+         * into an array.
+         */
+
+        const records = [];
+
+        snapshot.forEach((document) => {
+
+            records.push({
+                id: document.id,
+                data: document.data()
+            });
+
+        });
+
+
+const { startYear, startMonth } = getMaintenanceStart();
+
+        /*
+         * Process every maintenance record.
+         */
+
+        for (const record of records) {
+
+            const row =
+                record.data;
+
+            /*
+             * Only Maintenance Received records
+             * participate in outstanding calculation.
+             */
+
+            if (
+                row.type !== "Maintenance Received" ||
+                !row.owner ||
+                !row.flat ||
+                !row.maintenanceMonth
+            ) {
+                continue;
+            }
+
+            const [year, month] =
+                row.maintenanceMonth
+                    .split("-")
+                    .map(Number);
+
+            const monthlyDue =
+                maintenanceRates[row.flat] || 0;
+
+            /*
+             * Calculate the period number
+             * relative to January 2026.
+             *
+             * January 2026 = 0
+             * February 2026 = 1
+             * March 2026 = 2
+             * etc.
+             */
+
+            const currentPeriod =
+                (
+                    (year - startYear) * 12
+                ) +
+                (month - startMonth);
+
+            /*
+             * If the record is before January 2026,
+             * do not calculate maintenance due for it.
+             */
+
+            if (currentPeriod < 0) {
+                continue;
+            }
+
+            /*
+             * Maintenance due BEFORE
+             * the current month.
+             *
+             * Example:
+             *
+             * August 2026
+             *
+             * Jan-Jul = 7 months
+             */
+
+            const monthsBeforeCurrent =
+                currentPeriod;
+
+            const totalDueBeforeCurrent =
+                monthlyDue *
+                Math.max(
+                    monthsBeforeCurrent,
+                    0
+                );
+
+            /*
+             * Calculate ALL payments made
+             * before the current month.
+             */
+
+            let totalPaidBeforeCurrentMonth = 0;
+
+            records.forEach((otherRecord) => {
+
+                const other =
+                    otherRecord.data;
+
+                if (
+                    other.owner === row.owner &&
+                    other.flat === row.flat &&
+                    other.type === "Maintenance Received" &&
+                    other.maintenanceMonth
+                ) {
+
+                    const [otherYear, otherMonth] =
+                        other.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+                    const otherPeriod =
+                        (
+                            (otherYear - startYear) * 12
+                        ) +
+                        (otherMonth - startMonth);
+
+                    /*
+                     * IMPORTANT:
+                     *
+                     * Ignore payments before January 2026.
+                     *
+                     * Count only payments strictly
+                     * before the current month.
+                     */
+
+                    if (
+                        otherPeriod >= 0 &&
+                        otherPeriod < currentPeriod
+                    ) {
+
+                        const paid =
+                            Number(
+                                other.actuallyPaid ??
+                                other.amount ??
+                                0
+                            );
+
+                        totalPaidBeforeCurrentMonth +=
+                            paid;
+                    }
+                }
+            });
+
+            /*
+             * PREVIOUS OUTSTANDING
+             *
+             * Maintenance due before current month
+             * minus
+             * payments before current month.
+             */
+
+            const previousBalance =
+                totalDueBeforeCurrent -
+                totalPaidBeforeCurrentMonth;
+
+            /*
+             * Calculate ALL payments received
+             * up to and including current month.
+             */
+
+            let totalPaidUpToCurrentMonth = 0;
+
+            records.forEach((otherRecord) => {
+
+                const other =
+                    otherRecord.data;
+
+                if (
+                    other.owner === row.owner &&
+                    other.flat === row.flat &&
+                    other.type === "Maintenance Received" &&
+                    other.maintenanceMonth
+                ) {
+
+                    const [otherYear, otherMonth] =
+                        other.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+                    const otherPeriod =
+                        (
+                            (otherYear - startYear) * 12
+                        ) +
+                        (otherMonth - startMonth);
+
+                    /*
+                     * IMPORTANT:
+                     *
+                     * Ignore payments before January 2026.
+                     *
+                     * Include payments from January 2026
+                     * through the current month.
+                     */
+
+                    if (
+                        otherPeriod >= 0 &&
+                        otherPeriod <= currentPeriod
+                    ) {
+
+                        const paid =
+                            Number(
+                                other.actuallyPaid ??
+                                other.amount ??
+                                0
+                            );
+
+                        totalPaidUpToCurrentMonth +=
+                            paid;
+                    }
+                }
+            });
+
+            /*
+             * Total maintenance due INCLUDING
+             * the current month.
+             */
+
+            const totalDueThroughCurrent =
+                totalDueBeforeCurrent +
+                monthlyDue;
+
+            /*
+             * CURRENT OUTSTANDING
+             *
+             * Total due through current month
+             * minus
+             * all payments through current month.
+             */
+
+            const currentBalance =
+                totalDueThroughCurrent -
+                totalPaidUpToCurrentMonth;
+
+            /*
+             * Update Firestore.
+             */
+
+            await updateDoc(
+                doc(
+                    db,
+                    "ledger",
+                    record.id
+                ),
+                {
+                    maintenanceDue:
+                        monthlyDue,
+
+                    previousBalance:
+                        previousBalance,
+
+                    balance:
+                        currentBalance
+                }
+            );
+        }
+
+        alert(
+            "Ledger recalculated successfully."
+        );
+
+        /*
+         * Reload the ledger after recalculation.
+         */
+
+        await loadLedger();
+
+    } catch (error) {
+
+        console.error(
+            "RECALCULATE ERROR:",
+            error
+        );
+
+        alert(
+            "Failed to recalculate ledger: " +
+            error.message
+        );
+    }
+}
+
+async function add() {
+
+    const owner =
+        document.getElementById("owner").value;
+
+    const date =
+        document.getElementById("date").value;
+
+    const maintenanceMonth =
+        document.getElementById("maintenanceMonth").value;
+
+    const flat =
+        document.getElementById("flat").value;
+
+    const type =
+        document.getElementById("type").value;
+
+    const amount =
+        Number(
+            document.getElementById("amount").value
+        ) || 0;
+
+    const remarks =
+        document.getElementById("remarks").value;
+
+
+    if (
+        !owner ||
+        !date ||
+        !maintenanceMonth ||
+        !flat ||
+        !amount
+    ) {
+
+        alert(
+            "Please select Owner, Maintenance Month, Date, Flat and enter Amount."
+        );
+
+        return;
+    }
+    /*
+     * STEP 8:
+     * Prevent duplicate maintenance entries
+     * for the same owner + flat + month.
+     */
+
+    try {
+
+        const existingSnapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+
+        let duplicateFound = false;
+
+
+        existingSnapshot.forEach((document) => {
+
+            const row =
+                document.data();
+
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received" &&
+                row.maintenanceMonth === maintenanceMonth
+            ) {
+
+                duplicateFound = true;
+
+            }
+
+        });
+
+
+        if (duplicateFound) {
+
+            const proceed =
+                confirm(
+                    "A maintenance entry already exists for this Owner, Flat and Month.\n\n" +
+                    "Owner: " + owner + "\n" +
+                    "Flat: " + flat + "\n" +
+                    "Month: " + maintenanceMonth + "\n\n" +
+                    "Do you want to add another payment for the same month?"
+                );
+
+
+            if (!proceed) {
+
+                return;
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "DUPLICATE CHECK ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to check for duplicate entry: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+    try {
+
+        const [year, month] =
+            maintenanceMonth
+                .split("-")
+                .map(Number);
+
+
+        const monthlyDue =
+            maintenanceRates[flat] || 0;
+
+
+        let previousBalance = 0;
+        let currentBalance = 0;
+
+
+        /*
+         * Only maintenance receipts affect
+         * the maintenance outstanding balance.
+         */
+
+        if (type === "Maintenance Received") {
+
+            const snapshot =
+                await getDocs(
+                    collection(db, "ledger")
+                );
+
+
+            /*
+             * Find the first recorded year
+             * for this owner + flat.
+             */
+
+            /*
+ * STEP 9:
+ * Maintenance calculation starts from
+ * January of the current calendar year.
+ */
+
+/*
+ * Maintenance calculation starts from
+ * January of the current calendar year.
+ */
+
+const { startYear, startMonth } =
+    getMaintenanceStart();
+
+            /*
+             * Number of months before
+             * the selected maintenance month.
+             *
+             * Example:
+             *
+             * First year = 2025
+             * Selected = 2026-08
+             *
+             * Months before August 2026 =
+             * 19 months
+             */
+
+            const monthsBeforeCurrent =
+    (
+        (year - startYear) * 12
+    ) +
+    (month - startMonth);
+
+
+            /*
+             * Total maintenance due
+             * before the selected month.
+             */
+
+            const totalDueBeforeCurrent =
+                monthlyDue *
+                Math.max(
+                    monthsBeforeCurrent,
+                    0
+                );
+
+
+            /*
+             * Calculate ALL payments made
+             * before the selected month.
+             */
+
+            let totalPaidBeforeCurrentMonth = 0;
+
+
+            snapshot.forEach((document) => {
+
+                const row =
+                    document.data();
+
+
+                if (
+                    row.owner === owner &&
+                    row.flat === flat &&
+                    row.type === "Maintenance Received" &&
+                    row.maintenanceMonth
+                ) {
+
+                    const [rowYear, rowMonth] =
+                        row.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+
+                    const rowPeriod =
+    (
+        (rowYear - startYear) * 12
+    ) +
+    (rowMonth - startMonth);
+
+
+const currentPeriod =
+    (
+        (year - startYear) * 12
+    ) +
+    (month - startMonth);
+
+
+                    if (
+    rowPeriod >= 0 &&
+    rowPeriod < currentPeriod
+) {
+
+    const paid =
+        Number(
+            row.actuallyPaid ??
+            row.amount ??
+            0
+        );
+
+    totalPaidBeforeCurrentMonth +=
+        paid;
+
+}
+
+                }
+
+            });
+
+
+            /*
+             * PREVIOUS OUTSTANDING
+             *
+             * All maintenance due before
+             * current month
+             *
+             * minus
+             *
+             * all payments before current month.
+             */
+
+            previousBalance =
+                totalDueBeforeCurrent -
+                totalPaidBeforeCurrentMonth;
+
+
+            /*
+             * Find payments already received
+             * for the CURRENT maintenance month.
+             */
+
+            let paidInCurrentMonth = 0;
+
+
+            snapshot.forEach((document) => {
+
+                const row =
+                    document.data();
+
+
+                if (
+                    row.owner === owner &&
+                    row.flat === flat &&
+                    row.type === "Maintenance Received" &&
+                    row.maintenanceMonth === maintenanceMonth
+                ) {
+
+                    const paid =
+                        Number(
+                            row.actuallyPaid ??
+                            row.amount ??
+                            0
+                        );
+
+
+                    paidInCurrentMonth +=
+                        paid;
+
+                }
+
+            });
+
+
+            /*
+             * CURRENT OUTSTANDING
+             *
+             * Previous Outstanding
+             * + Current Month Maintenance
+             * - Existing Current Month Payments
+             * - New Payment
+             */
+
+            currentBalance =
+                previousBalance +
+                monthlyDue -
+                paidInCurrentMonth -
+                amount;
+
+        }
+
+
+        /*
+         * Save the new record.
+         */
+
+        await addDoc(
+            collection(db, "ledger"),
+            {
+
+                owner:
+                    owner,
+
+                maintenanceMonth:
+                    maintenanceMonth,
+
+                date:
+                    date,
+
+                flat:
+                    flat,
+
+                type:
+                    type,
+
+                amount:
+                    amount,
+
+                maintenanceDue:
+                    monthlyDue,
+
+                actuallyPaid:
+                    type === "Maintenance Received"
+                        ? amount
+                        : 0,
+
+                previousBalance:
+                    previousBalance,
+
+                balance:
+                    currentBalance,
+
+                remarks:
+                    remarks,
+
+                createdAt:
+                    new Date()
+            }
+        );
+
+
+        alert(
+            "Entry added successfully."
+        );
+
+
+        /*
+         * Clear form.
+         */
+
+        document.getElementById("owner").value = "";
+
+        document.getElementById("maintenanceMonth").value = "";
+
+        document.getElementById("date").value = "";
+
+        document.getElementById("flat").value = "";
+
+        document.getElementById("amount").value = "";
+
+        document.getElementById("maintenanceDue").value = "";
+
+        document.getElementById("previousBalance").value = "";
+
+        document.getElementById("balance").value = "";
+
+        document.getElementById("remarks").value = "";
+
+
+        /*
+         * Refresh ledger.
+         */
+
+        await loadLedger();
+
+
+    } catch (error) {
+
+        console.error(
+            "ADD ENTRY ERROR:",
+            error
+        );
+
+        alert(
+            "Failed to add entry: " +
+            error.message
+        );
+
+    }
+
+}
+
+async function loadLedger() {
+
+    const tbody =
+        document.querySelector("#tbl tbody");
+
+    tbody.innerHTML = "";
+
+    try {
+
+        const snapshot =
+            await getDocs(collection(db, "ledger"));
+
+
+        /*
+         * Store records so filterLedger()
+         * can use them without querying Firebase again.
+         */
+
+        window.ledgerRecords = [];
+
+
+        snapshot.forEach((document) => {
+
+            window.ledgerRecords.push({
+                id: document.id,
+                data: document.data()
+            });
+
+        });
+
+
+        /*
+         * Populate Year filter
+         */
+
+        const yearSelect =
+            document.getElementById("filterYear");
+
+        const years = new Set();
+
+
+        window.ledgerRecords.forEach((record) => {
+
+            const row = record.data;
+
+            if (row.maintenanceMonth) {
+
+                const year =
+                    row.maintenanceMonth.substring(0, 4);
+
+                years.add(year);
+
+            }
+
+        });
+
+
+        yearSelect.innerHTML =
+            '<option value="">All Years</option>';
+
+
+        [...years]
+            .sort()
+            .forEach((year) => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = year;
+                option.textContent = year;
+
+                yearSelect.appendChild(option);
+
+            });
+
+
+        /*
+         * Display all records
+         */
+
+        displayLedger(window.ledgerRecords);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+}
+
+function filterLedger() {
+
+    const selectedOwner =
+        document.getElementById("filterOwner").value;
+
+    const selectedYear =
+        document.getElementById("filterYear").value;
+
+    const filteredRecords =
+        window.ledgerRecords.filter((record) => {
+
+            const row = record.data;
+
+            const ownerMatches =
+                !selectedOwner ||
+                row.owner === selectedOwner;
+
+            const yearMatches =
+                !selectedYear ||
+                (
+                    row.maintenanceMonth &&
+                    row.maintenanceMonth.startsWith(selectedYear)
+                );
+
+            return ownerMatches && yearMatches;
+
+        });
+
+    displayLedger(filteredRecords);
+}
+
+function displayLedger(records) {
+
+    const tbody =
+        document.querySelector("#tbl tbody");
+
+    tbody.innerHTML = "";
+
+    if (!records || records.length === 0) {
+
+        const tr =
+            document.createElement("tr");
+
+        tr.innerHTML = `
+            <td colspan="10" style="text-align:center;">
+                No records found
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+
+        return;
+    }
+
+
+    records.forEach((record) => {
+
+        const row =
+            record.data;
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML = `
+
+<td>${row.owner ?? ""}</td>
+
+<td>${row.maintenanceMonth ?? ""}</td>
+
+<td>${row.date ?? ""}</td>
+
+<td>${row.flat ?? ""}</td>
+
+<td>${row.type ?? ""}</td>
+
+<td>
+    ${
+        row.type === "Maintenance Received"
+        ? "₹" + (row.maintenanceDue ?? 0)
+        : ""
+    }
+</td>
+
+<td>
+    ${
+        row.type === "Maintenance Received"
+        ? "₹" + (row.actuallyPaid ?? row.amount ?? 0)
+        : ""
+    }
+</td>
+
+<td>
+    ${
+        row.type === "Maintenance Received"
+        ? "₹" + (row.previousBalance ?? 0)
+        : ""
+    }
+</td>
+
+<td>
+    ${
+        row.type === "Maintenance Received"
+        ? "₹" + (row.balance ?? 0)
+        : ""
+    }
+</td>
+
+<td>${row.remarks ?? ""}</td>
+<td class="action-cell">
+
+    ${
+        window.isAdmin
+        ? `
+            <button
+                class="edit-btn"
+                onclick="editEntry('${record.id}')">
+                Edit
+            </button>
+
+            <button
+                class="delete-btn"
+                onclick="deleteEntry('${record.id}')">
+                Delete
+            </button>
+          `
+        : `
+            <button
+                class="edit-btn"
+                disabled>
+                Edit 🔒
+            </button>
+
+            <button
+                class="delete-btn"
+                disabled>
+                Delete 🔒
+            </button>
+          `
+    }
+
+</td>
+
+`;
+
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+async function deleteEntry(recordId) {
+
+    if (!window.isAdmin) {
+        alert("Only the administrator can delete entries.");
+        return;
+    }
+
+    const confirmDelete =
+        confirm(
+            "Are you sure you want to delete this entry?\n\n" +
+            "This action cannot be undone."
+        );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+
+        await deleteDoc(
+            doc(
+                db,
+                "ledger",
+                recordId
+            )
+        );
+
+        alert("Entry deleted successfully.");
+
+        await loadLedger();
+
+    } catch (error) {
+
+        console.error(
+            "DELETE ERROR:",
+            error
+        );
+
+        alert(
+            "Failed to delete entry: " +
+            error.message
+        );
+
+    }
+}
+
+
+async function editEntry(recordId) {
+
+    if (!window.isAdmin) {
+        alert("Only the administrator can edit entries.");
+        return;
+    }
+editingRecordId = recordId;
+
+    
+    const record =
+        window.ledgerRecords.find(
+            (item) => item.id === recordId
+        );
+
+    if (!record) {
+        alert("Entry not found.");
+        return;
+    }
+
+    const row = record.data;
+
+    document.getElementById("owner").value =
+        row.owner || "";
+
+    ownerSelected();
+
+    document.getElementById("flat").value =
+        row.flat || "";
+
+    document.getElementById("maintenanceMonth").value =
+        row.maintenanceMonth || "";
+
+    document.getElementById("date").value =
+        row.date || "";
+
+    document.getElementById("type").value =
+        row.type || "Maintenance Received";
+
+    document.getElementById("amount").value =
+        row.actuallyPaid ?? row.amount ?? "";
+
+    document.getElementById("remarks").value =
+        row.remarks || "";
+
+    flatSelected();
+
+    alert(
+        "Entry loaded for editing.\n\n" +
+        "After making changes, click Save Changes."
+    );
+    document.getElementById("saveEditButton").style.display = "inline-block";
+}
+
+
+async function saveEditedEntry() {
+
+    if (!window.isAdmin) {
+        alert("Only the administrator can edit entries.");
+        return;
+    }
+
+    if (!editingRecordId) {
+        alert("No entry is currently being edited.");
+        return;
+    }
+
+    const owner =
+        document.getElementById("owner").value;
+
+    const maintenanceMonth =
+        document.getElementById("maintenanceMonth").value;
+
+    const date =
+        document.getElementById("date").value;
+
+    const flat =
+        document.getElementById("flat").value;
+
+    const type =
+        document.getElementById("type").value;
+
+    const amount =
+        Number(
+            document.getElementById("amount").value
+        ) || 0;
+
+    const remarks =
+        document.getElementById("remarks").value;
+
+
+    if (
+        !owner ||
+        !maintenanceMonth ||
+        !date ||
+        !flat ||
+        !amount
+    ) {
+
+        alert(
+            "Please select Owner, Maintenance Month, Date, Flat and enter Amount."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        /*
+         * STEP 1
+         * Update the edited Firestore record.
+         */
+
+        await updateDoc(
+            doc(
+                db,
+                "ledger",
+                editingRecordId
+            ),
+            {
+
+                owner:
+                    owner,
+
+                maintenanceMonth:
+                    maintenanceMonth,
+
+                date:
+                    date,
+
+                flat:
+                    flat,
+
+                type:
+                    type,
+
+                amount:
+                    amount,
+
+                maintenanceDue:
+                    maintenanceRates[flat] || 0,
+
+                actuallyPaid:
+                    type === "Maintenance Received"
+                        ? amount
+                        : 0,
+
+                remarks:
+                    remarks
+            }
+        );
+
+
+        /*
+         * STEP 2
+         * Load ALL ledger records again.
+         */
+
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+
+        const records = [];
+
+
+        snapshot.forEach((document) => {
+
+            records.push({
+
+                id:
+                    document.id,
+
+                data:
+                    document.data()
+
+            });
+
+        });
+
+
+        /*
+         * Maintenance calculation starts
+         * from January of the current year.
+         */
+
+        const {
+            startYear,
+            startMonth
+        } =
+            getMaintenanceStart();
+
+
+        /*
+         * STEP 3
+         * Recalculate every maintenance
+         * record automatically.
+         */
+
+        for (const record of records) {
+
+            const row =
+                record.data;
+
+
+            /*
+             * Building Expense records do not
+             * participate in maintenance
+             * outstanding calculations.
+             */
+
+            if (
+                row.type !== "Maintenance Received" ||
+                !row.owner ||
+                !row.flat ||
+                !row.maintenanceMonth
+            ) {
+
+                continue;
+
+            }
+
+
+            const [
+                year,
+                month
+            ] =
+                row.maintenanceMonth
+                    .split("-")
+                    .map(Number);
+
+
+            const monthlyDue =
+                maintenanceRates[row.flat] || 0;
+
+
+            /*
+             * Calculate current period.
+             *
+             * January 2026 = 0
+             * February 2026 = 1
+             * March 2026 = 2
+             * etc.
+             */
+
+            const currentPeriod =
+                (
+                    (year - startYear) * 12
+                ) +
+                (
+                    month - startMonth
+                );
+
+
+            /*
+             * Ignore records before
+             * maintenance start date.
+             */
+
+            if (currentPeriod < 0) {
+
+                continue;
+
+            }
+
+
+            /*
+             * --------------------------------
+             * PREVIOUS OUTSTANDING
+             * --------------------------------
+             *
+             * Maintenance due before
+             * the current month
+             * minus
+             * payments before current month.
+             */
+
+            const totalDueBeforeCurrent =
+                monthlyDue *
+                Math.max(
+                    currentPeriod,
+                    0
+                );
+
+
+            let totalPaidBeforeCurrentMonth =
+                0;
+
+
+            records.forEach((otherRecord) => {
+
+                const other =
+                    otherRecord.data;
+
+
+                if (
+                    other.owner === row.owner &&
+                    other.flat === row.flat &&
+                    other.type === "Maintenance Received" &&
+                    other.maintenanceMonth
+                ) {
+
+                    const [
+                        otherYear,
+                        otherMonth
+                    ] =
+                        other.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+
+                    const otherPeriod =
+                        (
+                            (otherYear - startYear) * 12
+                        ) +
+                        (
+                            otherMonth - startMonth
+                        );
+
+
+                    /*
+                     * Only payments BEFORE
+                     * the current maintenance month.
+                     */
+
+                    if (
+                        otherPeriod >= 0 &&
+                        otherPeriod < currentPeriod
+                    ) {
+
+                        const paid =
+                            Number(
+                                other.actuallyPaid ??
+                                other.amount ??
+                                0
+                            );
+
+
+                        totalPaidBeforeCurrentMonth +=
+                            paid;
+
+                    }
+
+                }
+
+            });
+
+
+            const previousBalance =
+                totalDueBeforeCurrent -
+                totalPaidBeforeCurrentMonth;
+
+
+            /*
+             * --------------------------------
+             * CURRENT OUTSTANDING
+             * --------------------------------
+             *
+             * Total maintenance due through
+             * current month
+             *
+             * minus
+             *
+             * all payments through current month.
+             */
+
+            const totalDueThroughCurrent =
+                totalDueBeforeCurrent +
+                monthlyDue;
+
+
+            let totalPaidUpToCurrentMonth =
+                0;
+
+
+            records.forEach((otherRecord) => {
+
+                const other =
+                    otherRecord.data;
+
+
+                if (
+                    other.owner === row.owner &&
+                    other.flat === row.flat &&
+                    other.type === "Maintenance Received" &&
+                    other.maintenanceMonth
+                ) {
+
+                    const [
+                        otherYear,
+                        otherMonth
+                    ] =
+                        other.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+
+                    const otherPeriod =
+                        (
+                            (otherYear - startYear) * 12
+                        ) +
+                        (
+                            otherMonth - startMonth
+                        );
+
+
+                    /*
+                     * Include payments from
+                     * January 2026 through the
+                     * current maintenance month.
+                     */
+
+                    if (
+                        otherPeriod >= 0 &&
+                        otherPeriod <= currentPeriod
+                    ) {
+
+                        const paid =
+                            Number(
+                                other.actuallyPaid ??
+                                other.amount ??
+                                0
+                            );
+
+
+                        totalPaidUpToCurrentMonth +=
+                            paid;
+
+                    }
+
+                }
+
+            });
+
+
+            const currentBalance =
+                totalDueThroughCurrent -
+                totalPaidUpToCurrentMonth;
+
+
+            /*
+             * STEP 4
+             * Save recalculated balances.
+             */
+
+            await updateDoc(
+                doc(
+                    db,
+                    "ledger",
+                    record.id
+                ),
+                {
+
+                    maintenanceDue:
+                        monthlyDue,
+
+                    previousBalance:
+                        previousBalance,
+
+                    balance:
+                        currentBalance
+
+                }
+            );
+
+        }
+
+
+        /*
+         * STEP 5
+         * Finish editing mode.
+         */
+
+        editingRecordId = null;
+
+
+        document.getElementById(
+            "saveEditButton"
+        ).style.display = "none";
+
+
+        /*
+         * Clear form.
+         */
+
+        document.getElementById("owner").value = "";
+
+        document.getElementById("maintenanceMonth").value = "";
+
+        document.getElementById("date").value = "";
+
+        document.getElementById("flat").value = "";
+
+        document.getElementById("amount").value = "";
+
+        document.getElementById("maintenanceDue").value = "";
+
+        document.getElementById("previousBalance").value = "";
+
+        document.getElementById("balance").value = "";
+
+        document.getElementById("remarks").value = "";
+
+
+        /*
+         * STEP 6
+         * Reload the ledger.
+         */
+
+        await loadLedger();
+
+
+        alert(
+            "Entry updated and ledger balances recalculated successfully."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "EDIT SAVE / RECALCULATION ERROR:",
+            error
+        );
+
+
+        alert(
+            "Failed to update and recalculate entry: " +
+            error.message
+        );
+
+    }
+
+}
+function clearFilters() {
+
+    document.getElementById("filterOwner").value = "";
+
+    document.getElementById("filterYear").value = "";
+
+    displayLedger(window.ledgerRecords);
+
+}
+
+/*async function loadFlats() {
+const select = document.getElementById("flat");
+
+select.innerHTML = '<option value="">Select Flat</option>';  
+
+const snapshot = await getDocs(collection(db, "flats"));  
+
+snapshot.forEach((doc) => {  
+    const flat = doc.data();  
+
+    const option = document.createElement("option");  
+    option.value = flat.floor;  
+    option.textContent = flat.floor;  
+
+    select.appendChild(option);  
+});
+
+}*/
+
+async function download() {
+
+    try {
+
+        /*
+         * Get current filter values
+         */
+        const selectedOwner =
+            document.getElementById("filterOwner").value;
+
+        const selectedYear =
+            document.getElementById("filterYear").value;
+
+
+        /*
+         * Use the already-loaded ledger records.
+         * This means the CSV follows the filters
+         * currently selected on screen.
+         */
+        const records =
+            (window.ledgerRecords || []).filter((record) => {
+
+                const row = record.data;
+
+
+                const ownerMatches =
+                    !selectedOwner ||
+                    row.owner === selectedOwner;
+
+
+                const yearMatches =
+                    !selectedYear ||
+                    (
+                        row.maintenanceMonth &&
+                        row.maintenanceMonth.startsWith(selectedYear)
+                    );
+
+
+                return ownerMatches && yearMatches;
+
+            });
+
+
+        /*
+         * CSV headers
+         */
+        const headers = [
+
+            "Owner",
+            "Maintenance Month",
+            "Date",
+            "Flat",
+            "Type",
+            "Maintenance Due",
+            "Actually Paid",
+            "Previous Outstanding",
+            "Current Outstanding",
+            "Remarks"
+
+        ];
+
+
+        /*
+         * Make a value safe for CSV.
+         *
+         * Example:
+         * Soumen, ABC
+         *
+         * becomes:
+         * "Soumen, ABC"
+         *
+         * Quotes inside text are doubled.
+         */
+        function csvField(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                return '""';
+
+            }
+
+
+            return '"' +
+                String(value)
+                    .replace(/"/g, '""') +
+                '"';
+
+        }
+
+
+        /*
+         * Start CSV
+         */
+        let csv =
+            headers
+                .map(csvField)
+                .join(",") +
+            "\n";
+
+
+        /*
+         * Add filtered records
+         */
+        records.forEach((record) => {
+
+            const row =
+                record.data;
+
+
+            const data = [
+
+                row.owner || "",
+
+                row.maintenanceMonth || "",
+
+                row.date || "",
+
+                row.flat || "",
+
+                row.type || "",
+
+                row.type === "Maintenance Received"
+                    ? (row.maintenanceDue ?? 0)
+                    : "",
+
+                row.type === "Maintenance Received"
+                    ? (row.actuallyPaid ?? row.amount ?? 0)
+                    : "",
+
+                row.type === "Maintenance Received"
+                    ? (row.previousBalance ?? 0)
+                    : "",
+
+                row.type === "Maintenance Received"
+                    ? (row.balance ?? 0)
+                    : "",
+
+                row.remarks || ""
+
+            ];
+
+
+            csv +=
+                data
+                    .map(csvField)
+                    .join(",") +
+                "\n";
+
+        });
+
+
+        /*
+         * UTF-8 BOM.
+         *
+         * This helps Excel correctly display
+         * characters such as ₹.
+         */
+        const blob =
+            new Blob(
+                ["\uFEFF" + csv],
+                {
+                    type: "text/csv;charset=utf-8;"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+
+        const a =
+            document.createElement("a");
+
+
+        a.href = url;
+
+
+        /*
+         * Give the file a useful name
+         */
+        let fileName =
+            "Building_Maintenance_Ledger";
+
+
+        if (selectedOwner) {
+
+            fileName +=
+                "_" +
+                selectedOwner
+                    .replace(/\s+/g, "_");
+
+        }
+
+
+        if (selectedYear) {
+
+            fileName +=
+                "_" +
+                selectedYear;
+
+        }
+
+
+        fileName += ".csv";
+
+
+        a.download = fileName;
+
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+
+
+        /*
+         * Inform user if no records matched
+         */
+        if (records.length === 0) {
+
+            alert(
+                "No records found for the selected filters."
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "CSV EXPORT ERROR:",
+            error
+        );
+
+        alert(
+            "Failed to export CSV: " +
+            error.message
+        );
+
+    }
+
+}
+
+
+async function calculatePendingSummary() {
+
+    const selectedOwner =
+        document.getElementById("pendingOwner").value;
+
+    const selectedYear =
+        document.getElementById("pendingYear").value;
+
+    const selectedMonth =
+        document.getElementById("pendingMonth").value;
+
+    const tbody =
+        document.querySelector("#pendingResultTable tbody");
+
+    tbody.innerHTML = "";
+
+    if (!selectedOwner || !selectedYear || !selectedMonth) {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td colspan="7" style="text-align:center;">
+                Please select Owner, Starting Year and Starting Month.
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+
+        return;
+    }
+
+    try {
+
+        const flats =
+            ownerFlats[selectedOwner] || [];
+
+        if (flats.length === 0) {
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td colspan="7" style="text-align:center;">
+                    No flat assigned to this owner.
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+            return;
+        }
+
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+        /*
+         * Selected starting period
+         *
+         * Example:
+         * 2026 + 08 = August 2026
+         */
+        const startYear =
+            Number(selectedYear);
+
+        const startMonth =
+            Number(selectedMonth);
+
+        /*
+         * Current month
+         */
+        const today =
+            new Date();
+
+        const currentYear =
+            today.getFullYear();
+
+        const currentMonth =
+            today.getMonth() + 1;
+
+        /*
+         * Convert both dates to a simple
+         * month index.
+         */
+        const startPeriod =
+            (startYear * 12) + (startMonth - 1);
+
+        const currentPeriod =
+            (currentYear * 12) + (currentMonth - 1);
+
+        /*
+         * If selected starting month is
+         * after current month, no maintenance
+         * is due yet.
+         */
+        if (startPeriod > currentPeriod) {
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td colspan="7" style="text-align:center;">
+                    The selected starting month is in the future.
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+            return;
+        }
+
+        /*
+         * Number of months:
+         *
+         * January -> August = 8
+         * August -> August = 1
+         */
+        const monthsDue =
+            currentPeriod - startPeriod + 1;
+
+        flats.forEach((flat) => {
+
+            const monthlyMaintenance =
+                maintenanceRates[flat] || 0;
+
+            /*
+             * Total maintenance due
+             * from selected month through
+             * current month.
+             */
+            const totalMaintenanceDue =
+                monthlyMaintenance *
+                monthsDue;
+
+            /*
+             * Calculate payments made
+             * during the selected period.
+             */
+            let totalPaid = 0;
+
+            snapshot.forEach((document) => {
+
+                const row =
+                    document.data();
+
+                if (
+                    row.owner === selectedOwner &&
+                    row.flat === flat &&
+                    row.type === "Maintenance Received" &&
+                    row.maintenanceMonth
+                ) {
+
+                    const [rowYear, rowMonth] =
+                        row.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+                    const rowPeriod =
+                        (rowYear * 12) +
+                        (rowMonth - 1);
+
+                    /*
+                     * Count payments from
+                     * selected starting month
+                     * through current month.
+                     */
+                    if (
+                        rowPeriod >= startPeriod &&
+                        rowPeriod <= currentPeriod
+                    ) {
+
+                        totalPaid +=
+                            Number(
+                                row.actuallyPaid ??
+                                row.amount ??
+                                0
+                            );
+
+                    }
+
+                }
+
+            });
+
+            /*
+             * Pending amount
+             */
+            const pendingAmount =
+                totalMaintenanceDue -
+                totalPaid;
+
+            /*
+             * Add result row
+             */
+            const tr =
+                document.createElement("tr");
+
+            tr.innerHTML = `
+
+                <td>${selectedOwner}</td>
+
+                <td>${flat}</td>
+
+                <td>₹${monthlyMaintenance}</td>
+
+                <td>
+                    ${selectedYear}-${selectedMonth}
+                    to
+                    ${currentYear}-${String(currentMonth).padStart(2, "0")}
+                    (${monthsDue} month${monthsDue === 1 ? "" : "s"})
+                </td>
+
+                <td>₹${totalMaintenanceDue}</td>
+
+                <td>₹${totalPaid}</td>
+
+                <td>
+                    <strong>
+                        ₹${pendingAmount}
+                    </strong>
+                </td>
+
+            `;
+
+            tbody.appendChild(tr);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "PENDING SUMMARY ERROR:",
+            error
+        );
+
+        const tr =
+            document.createElement("tr");
+
+        tr.innerHTML = `
+            <td colspan="7"
+                style="text-align:center;color:red;">
+                Unable to calculate pending maintenance:
+                ${error.message}
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+
+    }
+
+}
+
+function openPendingPage() {
+
+    document.getElementById("ledgerPage").style.display = "none";
+
+    document.getElementById("pendingPage").style.display = "block";
+
+}
+
+function closePendingPage() {
+
+    document.getElementById("pendingPage").style.display = "none";
+
+    document.getElementById("ledgerPage").style.display = "block";
+
+}
+function openMaintenancePage() {
+
+    document.getElementById("homePage").style.display = "none";
+
+    document.getElementById("ledgerPage").style.display = "block";
+
+    loadLedger();
+}
+function closeMaintenancePage() {
+
+    document.getElementById("ledgerPage").style.display = "none";
+
+    document.getElementById("homePage").style.display = "block";
+
+}
+async function addBuildingExpense() {
+
+    const expenseType =
+        document.getElementById("expenseType").value;
+
+    const owner =
+        document.getElementById("expenseOwner").value;
+
+    const amountToBePaid =
+        Number(
+            document.getElementById("expenseDue").value
+        ) || 0;
+
+    const actualAmountPaid =
+        Number(
+            document.getElementById("expensePaid").value
+        ) || 0;
+
+    const remarks =
+        document.getElementById("expenseRemarks").value;
+
+
+    if (
+        !expenseType ||
+        !owner ||
+        amountToBePaid <= 0
+    ) {
+
+        alert(
+            "Please select Expense Type and Owner and enter Amount to be Paid."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        await addDoc(
+            collection(db, "ledger"),
+            {
+
+                type:
+                    "Building Expense",
+
+                expenseType:
+                    expenseType,
+
+                owner:
+                    owner,
+
+                expenseDue:
+                    amountToBePaid,
+
+                expensePaid:
+                    actualAmountPaid,
+
+                expenseDifference:
+                    amountToBePaid -
+                    actualAmountPaid,
+
+                remarks:
+                    remarks,
+
+                createdAt:
+                    new Date()
+
+            }
+        );
+
+
+        alert(
+            "Building expense added successfully."
+        );
+
+
+        clearExpenseForm();
+
+        await loadBuildingExpenses();
+
+
+    } catch (error) {
+
+        console.error(
+            "BUILDING EXPENSE ERROR:",
+            error
+        );
+
+        alert(
+            "Failed to add building expense: " +
+            error.message
+        );
+
+    }
+
+}
+function clearExpenseForm() {
+
+    document.getElementById("expenseType").value = "";
+
+    document.getElementById("expenseOwner").value = "";
+
+    document.getElementById("expenseDue").value = "";
+
+    document.getElementById("expensePaid").value = "";
+
+    document.getElementById("expenseRemarks").value = "";
+
+}
+async function loadBuildingExpenses() {
+
+    const tbody =
+        document.querySelector(
+            "#expenseSummaryTable tbody"
+        );
+
+    tbody.innerHTML = "";
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+
+        let totalDue = 0;
+
+        let totalPaid = 0;
+
+
+        let found = false;
+
+
+        snapshot.forEach((document) => {
+
+            const row =
+                document.data();
+
+
+            if (
+                row.type !== "Building Expense"
+            ) {
+
+                return;
+
+            }
+
+
+            found = true;
+
+
+            const due =
+                Number(
+                    row.expenseDue
+                ) || 0;
+
+
+            const paid =
+                Number(
+                    row.expensePaid
+                ) || 0;
+
+
+            const difference =
+                due -
+                paid;
+
+
+            totalDue += due;
+
+            totalPaid += paid;
+
+
+            const tr =
+                document.createElement("tr");
+
+
+            tr.innerHTML = `
+
+                <td>
+                    ${row.expenseType ?? ""}
+                </td>
+
+                <td>
+                    ${row.owner ?? ""}
+                </td>
+
+                <td>
+                    ₹${due}
+                </td>
+
+                <td>
+                    ₹${paid}
+                </td>
+
+                <td>
+                    ₹${difference}
+                </td>
+
+                <td>
+                    ${row.remarks ?? ""}
+                </td>
+
+            `;
+
+
+            tbody.appendChild(tr);
+
+        });
+
+
+        if (!found) {
+
+            const tr =
+                document.createElement("tr");
+
+            tr.innerHTML = `
+                <td colspan="6"
+                    style="text-align:center;">
+                    No building expenses entered.
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+        }
+
+
+        const totalDifference =
+            totalDue -
+            totalPaid;
+
+
+        document.getElementById(
+            "expenseTotalDue"
+        ).textContent =
+            "₹" + totalDue;
+
+
+        document.getElementById(
+            "expenseTotalPaid"
+        ).textContent =
+            "₹" + totalPaid;
+
+
+        document.getElementById(
+            "expenseTotalDifference"
+        ).textContent =
+            "₹" + totalDifference;
+
+
+    } catch (error) {
+
+        console.error(
+            "LOAD EXPENSE ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to load building expenses: " +
+            error.message
+        );
+
+    }
+
+}
+async function openExpensePage() {
+
+    document.getElementById("homePage").style.display = "none";
+
+    document.getElementById("expensePage").style.display = "block";
+
+    await loadBuildingExpenses();
+
+}
+function closeExpensePage() {
+
+    document.getElementById("expensePage").style.display = "none";
+
+    document.getElementById("homePage").style.display = "block";
+
+}
+function openBalanceSheetPage() {
+
+    document.getElementById("homePage").style.display = "none";
+
+    document.getElementById("balanceSheetPage").style.display = "block";
+
+}
+function closeBalanceSheetPage() {
+
+    document.getElementById("balanceSheetPage").style.display = "none";
+
+    document.getElementById("homePage").style.display = "block";
+
+}
+function calculateBalanceSheet() {
+
+    const month =
+        document.getElementById("balanceSheetMonth").value;
+
+    if (!month) {
+
+        alert("Please select a month.");
+
+        return;
+    }
+
+    alert(
+        "Balance Sheet calculation for " +
+        month +
+        " will be added next."
+    );
+
+}
+window.login = login;
+window.openMaintenancePage = openMaintenancePage;
+window.closeMaintenancePage = closeMaintenancePage;
+window.openExpensePage = openExpensePage;
+window.openBalanceSheetPage = openBalanceSheetPage;
+window.closeBalanceSheetPage = closeBalanceSheetPage;
+window.calculateBalanceSheet = calculateBalanceSheet;
+window.closeExpensePage = closeExpensePage;
+window.addBuildingExpense = addBuildingExpense;
+window.clearExpenseForm = clearExpenseForm;
+window.openPendingPage = openPendingPage;
+window.closePendingPage = closePendingPage;
+window.logout = logout;
+window.add = add;
+window.download = download;
+
+window.ownerSelected = ownerSelected;
+
+window.filterLedger = filterLedger;
+window.displayLedger = displayLedger;
+window.clearFilters = clearFilters;
+window.saveEditedEntry = saveEditedEntry;
+window.flatSelected = flatSelected;
+window.recalculateLedger = recalculateLedger;
+window.calculateCurrentBalance = calculateCurrentBalance;
+
+window.deleteEntry = deleteEntry;
+window.editEntry = editEntry;
+window.calculatePendingSummary =
+    calculatePendingSummary;
+// Check whether the user is already logged in
+onAuthStateChanged(auth, (user) => {
+
+    if (user) {
+
+        // User is logged in
+        document.getElementById("loginPage").style.display = "none";
+
+        // Show HOME page after login
+        document.getElementById("homePage").style.display = "block";
+
+        // Hide all other pages
+        document.getElementById("ledgerPage").style.display = "none";
+        document.getElementById("expensePage").style.display = "none";
+        document.getElementById("pendingPage").style.display = "none";
+        document.getElementById("balanceSheetPage").style.display = "none";
+
+        // Check whether this user is Admin
+        window.isAdmin =
+            user.email &&
+            user.email.toLowerCase() ===
+            ADMIN_EMAIL.toLowerCase();
+
+    } else {
+
+        // User is not logged in
+
+        document.getElementById("loginPage").style.display = "block";
+
+        // Hide all application pages
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("ledgerPage").style.display = "none";
+        document.getElementById("expensePage").style.display = "none";
+        document.getElementById("pendingPage").style.display = "none";
+
+        window.isAdmin = false;
+    }
+
+});
+
+//loadFlats();
+//loadLedger();
+</script>
+</body>
+        </html>    </p>
 
     <label>
         <strong>Month:</strong>
