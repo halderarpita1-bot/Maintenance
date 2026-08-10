@@ -260,6 +260,11 @@
     </td>  
 </tr>  
 </table><button onclick="add()">Add Entry</button>
+<button id="saveEditButton"
+        onclick="saveEditedEntry()"
+        style="display:none;">
+    Save Changes
+</button>
 <button onclick="download()">Export CSV</button>
 <button onclick="recalculateLedger()">Recalculate Ledger</button>
 
@@ -321,8 +326,10 @@
 <th>Maintenance Due</th>  
 <th>Actually Paid</th>  
 <th>Previous Outstanding</th>  
-<th>Current Outstanding</th>  
-<th>Remarks</th>  
+
+<th>Current Outstanding</th>
+<th>Remarks</th>
+<th>Actions</th>
 </tr>  
 </thead>  
 <tbody></tbody>  
@@ -337,6 +344,7 @@ import {
     addDoc,
     getDocs,
     updateDoc,
+    deleteDoc,
     doc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import {
@@ -365,7 +373,8 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 // Monthly maintenance amount for each flat
 // CHANGE THESE AMOUNTS TO YOUR ACTUAL AMOUNTS
-
+const ADMIN_EMAIL = "admin@buildingledger.com";
+let editingRecordId = null;
 const maintenanceRates = {
 
 "GF1": 310,  
@@ -1814,8 +1823,42 @@ function displayLedger(records) {
 </td>
 
 <td>${row.remarks ?? ""}</td>
+<td class="action-cell">
+
+    ${
+        window.isAdmin
+        ? `
+            <button
+                class="edit-btn"
+                onclick="editEntry('${record.id}')">
+                Edit
+            </button>
+
+            <button
+                class="delete-btn"
+                onclick="deleteEntry('${record.id}')">
+                Delete
+            </button>
+          `
+        : `
+            <button
+                class="edit-btn"
+                disabled>
+                Edit 🔒
+            </button>
+
+            <button
+                class="delete-btn"
+                disabled>
+                Delete 🔒
+            </button>
+          `
+    }
+
+</td>
 
 `;
+
 
 
         tbody.appendChild(tr);
@@ -1824,6 +1867,587 @@ function displayLedger(records) {
 
 }
 
+async function deleteEntry(recordId) {
+
+    if (!window.isAdmin) {
+        alert("Only the administrator can delete entries.");
+        return;
+    }
+
+    const confirmDelete =
+        confirm(
+            "Are you sure you want to delete this entry?\n\n" +
+            "This action cannot be undone."
+        );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+
+        await deleteDoc(
+            doc(
+                db,
+                "ledger",
+                recordId
+            )
+        );
+
+        alert("Entry deleted successfully.");
+
+        await loadLedger();
+
+    } catch (error) {
+
+        console.error(
+            "DELETE ERROR:",
+            error
+        );
+
+        alert(
+            "Failed to delete entry: " +
+            error.message
+        );
+
+    }
+}
+
+
+async function editEntry(recordId) {
+
+    if (!window.isAdmin) {
+        alert("Only the administrator can edit entries.");
+        return;
+    }
+editingRecordId = recordId;
+
+    
+    const record =
+        window.ledgerRecords.find(
+            (item) => item.id === recordId
+        );
+
+    if (!record) {
+        alert("Entry not found.");
+        return;
+    }
+
+    const row = record.data;
+
+    document.getElementById("owner").value =
+        row.owner || "";
+
+    ownerSelected();
+
+    document.getElementById("flat").value =
+        row.flat || "";
+
+    document.getElementById("maintenanceMonth").value =
+        row.maintenanceMonth || "";
+
+    document.getElementById("date").value =
+        row.date || "";
+
+    document.getElementById("type").value =
+        row.type || "Maintenance Received";
+
+    document.getElementById("amount").value =
+        row.actuallyPaid ?? row.amount ?? "";
+
+    document.getElementById("remarks").value =
+        row.remarks || "";
+
+    flatSelected();
+
+    alert(
+        "Entry loaded for editing.\n\n" +
+        "After making changes, click Save Changes."
+    );
+    document.getElementById("saveEditButton").style.display = "inline-block";
+}
+
+
+async function saveEditedEntry() {
+
+    if (!window.isAdmin) {
+        alert("Only the administrator can edit entries.");
+        return;
+    }
+
+    if (!editingRecordId) {
+        alert("No entry is currently being edited.");
+        return;
+    }
+
+    const owner =
+        document.getElementById("owner").value;
+
+    const maintenanceMonth =
+        document.getElementById("maintenanceMonth").value;
+
+    const date =
+        document.getElementById("date").value;
+
+    const flat =
+        document.getElementById("flat").value;
+
+    const type =
+        document.getElementById("type").value;
+
+    const amount =
+        Number(
+            document.getElementById("amount").value
+        ) || 0;
+
+    const remarks =
+        document.getElementById("remarks").value;
+
+
+    if (
+        !owner ||
+        !maintenanceMonth ||
+        !date ||
+        !flat ||
+        !amount
+    ) {
+
+        alert(
+            "Please select Owner, Maintenance Month, Date, Flat and enter Amount."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        /*
+         * STEP 1
+         * Update the edited Firestore record.
+         */
+
+        await updateDoc(
+            doc(
+                db,
+                "ledger",
+                editingRecordId
+            ),
+            {
+
+                owner:
+                    owner,
+
+                maintenanceMonth:
+                    maintenanceMonth,
+
+                date:
+                    date,
+
+                flat:
+                    flat,
+
+                type:
+                    type,
+
+                amount:
+                    amount,
+
+                maintenanceDue:
+                    maintenanceRates[flat] || 0,
+
+                actuallyPaid:
+                    type === "Maintenance Received"
+                        ? amount
+                        : 0,
+
+                remarks:
+                    remarks
+            }
+        );
+
+
+        /*
+         * STEP 2
+         * Load ALL ledger records again.
+         */
+
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+
+        const records = [];
+
+
+        snapshot.forEach((document) => {
+
+            records.push({
+
+                id:
+                    document.id,
+
+                data:
+                    document.data()
+
+            });
+
+        });
+
+
+        /*
+         * Maintenance calculation starts
+         * from January of the current year.
+         */
+
+        const {
+            startYear,
+            startMonth
+        } =
+            getMaintenanceStart();
+
+
+        /*
+         * STEP 3
+         * Recalculate every maintenance
+         * record automatically.
+         */
+
+        for (const record of records) {
+
+            const row =
+                record.data;
+
+
+            /*
+             * Building Expense records do not
+             * participate in maintenance
+             * outstanding calculations.
+             */
+
+            if (
+                row.type !== "Maintenance Received" ||
+                !row.owner ||
+                !row.flat ||
+                !row.maintenanceMonth
+            ) {
+
+                continue;
+
+            }
+
+
+            const [
+                year,
+                month
+            ] =
+                row.maintenanceMonth
+                    .split("-")
+                    .map(Number);
+
+
+            const monthlyDue =
+                maintenanceRates[row.flat] || 0;
+
+
+            /*
+             * Calculate current period.
+             *
+             * January 2026 = 0
+             * February 2026 = 1
+             * March 2026 = 2
+             * etc.
+             */
+
+            const currentPeriod =
+                (
+                    (year - startYear) * 12
+                ) +
+                (
+                    month - startMonth
+                );
+
+
+            /*
+             * Ignore records before
+             * maintenance start date.
+             */
+
+            if (currentPeriod < 0) {
+
+                continue;
+
+            }
+
+
+            /*
+             * --------------------------------
+             * PREVIOUS OUTSTANDING
+             * --------------------------------
+             *
+             * Maintenance due before
+             * the current month
+             * minus
+             * payments before current month.
+             */
+
+            const totalDueBeforeCurrent =
+                monthlyDue *
+                Math.max(
+                    currentPeriod,
+                    0
+                );
+
+
+            let totalPaidBeforeCurrentMonth =
+                0;
+
+
+            records.forEach((otherRecord) => {
+
+                const other =
+                    otherRecord.data;
+
+
+                if (
+                    other.owner === row.owner &&
+                    other.flat === row.flat &&
+                    other.type === "Maintenance Received" &&
+                    other.maintenanceMonth
+                ) {
+
+                    const [
+                        otherYear,
+                        otherMonth
+                    ] =
+                        other.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+
+                    const otherPeriod =
+                        (
+                            (otherYear - startYear) * 12
+                        ) +
+                        (
+                            otherMonth - startMonth
+                        );
+
+
+                    /*
+                     * Only payments BEFORE
+                     * the current maintenance month.
+                     */
+
+                    if (
+                        otherPeriod >= 0 &&
+                        otherPeriod < currentPeriod
+                    ) {
+
+                        const paid =
+                            Number(
+                                other.actuallyPaid ??
+                                other.amount ??
+                                0
+                            );
+
+
+                        totalPaidBeforeCurrentMonth +=
+                            paid;
+
+                    }
+
+                }
+
+            });
+
+
+            const previousBalance =
+                totalDueBeforeCurrent -
+                totalPaidBeforeCurrentMonth;
+
+
+            /*
+             * --------------------------------
+             * CURRENT OUTSTANDING
+             * --------------------------------
+             *
+             * Total maintenance due through
+             * current month
+             *
+             * minus
+             *
+             * all payments through current month.
+             */
+
+            const totalDueThroughCurrent =
+                totalDueBeforeCurrent +
+                monthlyDue;
+
+
+            let totalPaidUpToCurrentMonth =
+                0;
+
+
+            records.forEach((otherRecord) => {
+
+                const other =
+                    otherRecord.data;
+
+
+                if (
+                    other.owner === row.owner &&
+                    other.flat === row.flat &&
+                    other.type === "Maintenance Received" &&
+                    other.maintenanceMonth
+                ) {
+
+                    const [
+                        otherYear,
+                        otherMonth
+                    ] =
+                        other.maintenanceMonth
+                            .split("-")
+                            .map(Number);
+
+
+                    const otherPeriod =
+                        (
+                            (otherYear - startYear) * 12
+                        ) +
+                        (
+                            otherMonth - startMonth
+                        );
+
+
+                    /*
+                     * Include payments from
+                     * January 2026 through the
+                     * current maintenance month.
+                     */
+
+                    if (
+                        otherPeriod >= 0 &&
+                        otherPeriod <= currentPeriod
+                    ) {
+
+                        const paid =
+                            Number(
+                                other.actuallyPaid ??
+                                other.amount ??
+                                0
+                            );
+
+
+                        totalPaidUpToCurrentMonth +=
+                            paid;
+
+                    }
+
+                }
+
+            });
+
+
+            const currentBalance =
+                totalDueThroughCurrent -
+                totalPaidUpToCurrentMonth;
+
+
+            /*
+             * STEP 4
+             * Save recalculated balances.
+             */
+
+            await updateDoc(
+                doc(
+                    db,
+                    "ledger",
+                    record.id
+                ),
+                {
+
+                    maintenanceDue:
+                        monthlyDue,
+
+                    previousBalance:
+                        previousBalance,
+
+                    balance:
+                        currentBalance
+
+                }
+            );
+
+        }
+
+
+        /*
+         * STEP 5
+         * Finish editing mode.
+         */
+
+        editingRecordId = null;
+
+
+        document.getElementById(
+            "saveEditButton"
+        ).style.display = "none";
+
+
+        /*
+         * Clear form.
+         */
+
+        document.getElementById("owner").value = "";
+
+        document.getElementById("maintenanceMonth").value = "";
+
+        document.getElementById("date").value = "";
+
+        document.getElementById("flat").value = "";
+
+        document.getElementById("amount").value = "";
+
+        document.getElementById("maintenanceDue").value = "";
+
+        document.getElementById("previousBalance").value = "";
+
+        document.getElementById("balance").value = "";
+
+        document.getElementById("remarks").value = "";
+
+
+        /*
+         * STEP 6
+         * Reload the ledger.
+         */
+
+        await loadLedger();
+
+
+        alert(
+            "Entry updated and ledger balances recalculated successfully."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "EDIT SAVE / RECALCULATION ERROR:",
+            error
+        );
+
+
+        alert(
+            "Failed to update and recalculate entry: " +
+            error.message
+        );
+
+    }
+
+}
 function clearFilters() {
 
     document.getElementById("filterOwner").value = "";
@@ -2382,30 +3006,40 @@ window.ownerSelected = ownerSelected;
 window.filterLedger = filterLedger;
 window.displayLedger = displayLedger;
 window.clearFilters = clearFilters;
+window.saveEditedEntry = saveEditedEntry;
 window.flatSelected = flatSelected;
 window.recalculateLedger = recalculateLedger;
 window.calculateCurrentBalance = calculateCurrentBalance;
 
+window.deleteEntry = deleteEntry;
+window.editEntry = editEntry;
 window.calculatePendingSummary =
     calculatePendingSummary;
 // Check whether the user is already logged in
 onAuthStateChanged(auth, (user) => {
 
-if (user) {  
+    if (user) {
 
-    // User is logged in  
-    document.getElementById("loginPage").style.display = "none";  
-    document.getElementById("ledgerPage").style.display = "block";  
+        // User is logged in
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("ledgerPage").style.display = "block";
 
-    loadLedger();  
+        // Check whether this user is Admin
+        window.isAdmin =
+            user.email &&
+            user.email.toLowerCase() ===
+            ADMIN_EMAIL.toLowerCase();
 
-} else {  
+        loadLedger();
 
-    // User is not logged in  
-    document.getElementById("loginPage").style.display = "block";  
-    document.getElementById("ledgerPage").style.display = "none";  
+    } else {
 
-}
+        // User is not logged in
+        document.getElementById("loginPage").style.display = "block";
+        document.getElementById("ledgerPage").style.display = "none";
+
+        window.isAdmin = false;
+    }
 
 });
 
