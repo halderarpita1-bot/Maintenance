@@ -80,6 +80,10 @@
 <option value="Arpita Chakraborty">Arpita Chakraborty</option>
 <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
 
+       
+<option value="Dummy Owner1">Dummy Owner1</option>
+<option value="Dummy Owner2">Dummy Owner2</option>
+
                 </select>
             </td>
         </tr>
@@ -187,6 +191,13 @@
        
 <option value="Arpita Chakraborty">Arpita Chakraborty</option>
 <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
+
+       
+<option value="Dummy Owner1">Dummy Owner1</option>
+
+       
+<option value="Dummy Owner2">Dummy Owner2</option>
+
 </select>  
 </td>
 </tr>  
@@ -218,6 +229,9 @@
 <option value="2ndFloor 4">2ndFloor 4</option>  
 <option value="3rdFloor 1">3rdFloor 1</option>  
 <option value="3rdFloor 2">3rdFloor 2</option>  
+
+<option value="Dummy Flat1">Dummy Flat1</option>
+<option value="Dummy Flat2">Dummy Flat2</option>
 
         </select>  
     </td>  
@@ -298,6 +312,8 @@
 <option value="Arpita Chakraborty">Arpita Chakraborty</option>
 <option value="Arun Kumar Dutta">Arun Kumar Dutta</option>
 
+<option value="Dummy Owner1">Dummy Owner1</option>
+<option value="Dummy Owner2">Dummy Owner2</option>
     </select>
 
 
@@ -308,8 +324,6 @@
     <select id="filterYear" onchange="filterLedger()">
         <option value="">All Years</option>
     </select>
-
-
     <button onclick="clearFilters()">
         Clear Filters
     </button>
@@ -393,6 +407,10 @@ const maintenanceRates = {
 "3rdFloor 1": 495,  
 "3rdFloor 2": 600,  
 
+"Dummy Flat1": 100,
+"Dummy Flat2": 110,
+
+
 };
 const ownerFlats = {
 
@@ -414,10 +432,10 @@ const ownerFlats = {
 
     "Arpita Chakraborty": ["3rdFloor 1"],
     "Arun Kumar Dutta": ["3rdFloor 2"],
-     
+     "Dummy Owner1" : ["Dummy Flat1"],
+     "Dummy Owner2" : ["Dummy Flat2"]
+
 };
-
-
 function ownerSelected() {
 
     const owner =
@@ -462,8 +480,6 @@ function ownerSelected() {
         flatSelected();
     }
 }
-
-
 function getMaintenanceStart() {
 
     const currentYear =
@@ -518,7 +534,6 @@ try {
 }
 
 }
-
 async function logout() {
 
 try {  
@@ -3047,4 +3062,4 @@ onAuthStateChanged(auth, (user) => {
 //loadLedger();
 </script>
 </body>
-</html>
+    </html>
