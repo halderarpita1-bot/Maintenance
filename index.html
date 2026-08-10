@@ -78,6 +78,8 @@
 
 <div id="expensePage" style="display:none;">
 
+    <button onclick="logout()">Logout</button>
+
     <h2>Building Expenses</h2>
 
     <p>Enter building-related expenses.</p>
@@ -87,9 +89,65 @@
     </button>
 
 </div>
+
+<!-- BALANCE SHEET PAGE -->
+
+<div id="balanceSheetPage" style="display:none;">
+
+    <button onclick="logout()">Logout</button>
+
+    <h2>Monthly Balance Sheet</h2>
+
+    <p>
+        Select the month to calculate the building's
+        maintenance balance.
+    </p>
+
+    <label>
+        <strong>Month:</strong>
+    </label>
+
+    <input id="balanceSheetMonth" type="month">
+
+    <br><br>
+
+    <button onclick="calculateBalanceSheet()">
+        Calculate Balance Sheet
+    </button>
+
+    <button onclick="closeBalanceSheetPage()">
+        Back to Home
+    </button>
+
+    <br><br>
+
+    <table id="balanceSheetTable">
+
+        <thead>
+            <tr>
+                <th>Particular</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    Select a month and click Calculate Balance Sheet.
+                </td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
 <!-- PENDING MAINTENANCE PAGE -->
 
 <div id="pendingPage" style="display:none;">
+
+    <button onclick="logout()">Logout</button>
 
     <h2>Pending Maintenance</h2>
 
@@ -578,23 +636,34 @@ document.getElementById("homePage").style.display = "block";
 }
 async function logout() {
 
-try {  
+    try {
 
-    await signOut(auth);  
+        await signOut(auth);
 
-    document.getElementById("ledgerPage").style.display = "none";  
-    document.getElementById("loginPage").style.display = "block";  
+        // Hide every application page
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("ledgerPage").style.display = "none";
+        document.getElementById("expensePage").style.display = "none";
+        document.getElementById("pendingPage").style.display = "none";
+document.getElementById("balanceSheetPage").style.display = "none";
+        // Show ONLY the login page
+        document.getElementById("loginPage").style.display = "block";
 
-    document.getElementById("loginEmail").value = "";  
-    document.getElementById("loginPassword").value = "";  
-    document.getElementById("loginMessage").textContent = "";  
+        // Clear login fields
+        document.getElementById("loginEmail").value = "";
+        document.getElementById("loginPassword").value = "";
+        document.getElementById("loginMessage").textContent = "";
 
-} catch (error) {  
+        // Reset admin status
+        window.isAdmin = false;
 
-    console.error(error);  
-    alert("Logout failed.");  
+    } catch (error) {
 
-}
+        console.error("LOGOUT ERROR:", error);
+
+        alert("Logout failed: " + error.message);
+
+    }
 
 }
 
@@ -3072,9 +3141,45 @@ function closeExpensePage() {
     document.getElementById("homePage").style.display = "block";
 
 }
+function openBalanceSheetPage() {
+
+    document.getElementById("homePage").style.display = "none";
+
+    document.getElementById("balanceSheetPage").style.display = "block";
+
+}
+function closeBalanceSheetPage() {
+
+    document.getElementById("balanceSheetPage").style.display = "none";
+
+    document.getElementById("homePage").style.display = "block";
+
+}
+function calculateBalanceSheet() {
+
+    const month =
+        document.getElementById("balanceSheetMonth").value;
+
+    if (!month) {
+
+        alert("Please select a month.");
+
+        return;
+    }
+
+    alert(
+        "Balance Sheet calculation for " +
+        month +
+        " will be added next."
+    );
+
+}
 window.login = login;
 window.openMaintenancePage = openMaintenancePage;
 window.openExpensePage = openExpensePage;
+window.openBalanceSheetPage = openBalanceSheetPage;
+window.closeBalanceSheetPage = closeBalanceSheetPage;
+window.calculateBalanceSheet = calculateBalanceSheet;
 window.closeExpensePage = closeExpensePage;
 window.openPendingPage = openPendingPage;
 window.closePendingPage = closePendingPage;
@@ -3103,7 +3208,15 @@ onAuthStateChanged(auth, (user) => {
 
         // User is logged in
         document.getElementById("loginPage").style.display = "none";
-        document.getElementById("ledgerPage").style.display = "block";
+
+        // Show HOME page after login
+        document.getElementById("homePage").style.display = "block";
+
+        // Hide all other pages
+        document.getElementById("ledgerPage").style.display = "none";
+        document.getElementById("expensePage").style.display = "none";
+        document.getElementById("pendingPage").style.display = "none";
+        document.getElementById("balanceSheetPage").style.display = "none";
 
         // Check whether this user is Admin
         window.isAdmin =
@@ -3111,13 +3224,17 @@ onAuthStateChanged(auth, (user) => {
             user.email.toLowerCase() ===
             ADMIN_EMAIL.toLowerCase();
 
-        loadLedger();
-
     } else {
 
         // User is not logged in
+
         document.getElementById("loginPage").style.display = "block";
+
+        // Hide all application pages
+        document.getElementById("homePage").style.display = "none";
         document.getElementById("ledgerPage").style.display = "none";
+        document.getElementById("expensePage").style.display = "none";
+        document.getElementById("pendingPage").style.display = "none";
 
         window.isAdmin = false;
     }
@@ -3128,4 +3245,4 @@ onAuthStateChanged(auth, (user) => {
 //loadLedger();
 </script>
 </body>
-    </html>
+</html>
