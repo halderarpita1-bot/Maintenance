@@ -837,17 +837,22 @@
 </select>  
 </td>
 </tr>  
-<tr>  
-    <td>Maintenance Month</td>  
-    <td>  
-        <input id="maintenanceMonth" type="month">  
-    </td>  
-</tr>  <tr>  
-    <td>Date</td>  
-    <td>  
-        <input id="date" type="date">  
-    </td>  
-</tr>  
+<tr>
+    <td>Maintenance Payment Date</td>
+    <td>
+        <input id="date" type="date">
+    </td>
+</tr>
+
+<tr>
+    <td>Maintenance Month(s) Covered</td>
+    <td>
+        <div id="maintenanceMonthsContainer">
+            <!-- Months will be generated here -->
+        </div>
+    </td>
+</tr> 
+
 <tr>  
     <td>Flat</td>  
     <td>  
@@ -1255,6 +1260,89 @@ document.getElementById("balanceSheetPage").style.display = "none";
     }
 
 }
+function generateMaintenanceMonths() {
+
+    const owner =
+        document.getElementById("owner").value;
+
+    const flat =
+        document.getElementById("flat").value;
+
+    const container =
+        document.getElementById("maintenanceMonthsContainer");
+
+    container.innerHTML = "";
+
+    if (!owner || !flat) {
+        container.innerHTML =
+            "Select Owner and Flat first.";
+        return;
+    }
+
+    const monthlyDue =
+        Number(maintenanceRates[flat] || 0);
+
+    if (monthlyDue <= 0) {
+        container.innerHTML =
+            "Maintenance rate not configured for this flat.";
+        return;
+    }
+
+    const today = new Date();
+
+    const currentYear =
+        today.getFullYear();
+
+    const currentMonth =
+        today.getMonth() + 1;
+
+    for (
+        let month = 1;
+        month <= currentMonth;
+        month++
+    ) {
+
+        const monthValue =
+            `${currentYear}-${String(month).padStart(2, "0")}`;
+
+        const monthName =
+            new Date(
+                currentYear,
+                month - 1,
+                1
+            ).toLocaleString(
+                "en-IN",
+                { month: "long" }
+            );
+
+        const row =
+            document.createElement("div");
+
+        row.style.marginBottom = "8px";
+
+        row.innerHTML = `
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    class="maintenance-month-checkbox"
+                    value="${monthValue}"
+                    data-amount="${monthlyDue}"
+                >
+
+                ${monthName} ${currentYear}
+                — ₹${monthlyDue}
+
+            </label>
+
+        `;
+
+        container.appendChild(row);
+    }
+}
+
+
 
 function flatSelected() {
 
@@ -1272,6 +1360,7 @@ const due = maintenanceRates[flat] || 0;
 document.getElementById("maintenanceDue").value = due;  
 
 calculatePreviousBalance();
+generateMaintenanceMonths();
 
 }
 
@@ -1283,10 +1372,7 @@ async function calculatePreviousBalance() {
     const flat =
         document.getElementById("flat").value;
 
-    const maintenanceMonth =
-        document.getElementById("maintenanceMonth").value;
-
-    if (!owner || !flat || !maintenanceMonth) {
+    if (!owner || !flat) {
 
         document.getElementById("previousBalance").value = "";
         document.getElementById("balance").value = "";
@@ -1296,27 +1382,37 @@ async function calculatePreviousBalance() {
 
     try {
 
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
+
+        let totalPaid = 0;
+
+        snapshot.forEach((documentSnapshot) => {
+
+            const row =
+                documentSnapshot.data();
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received"
+            ) {
+
+                totalPaid +=
+                    Number(
+                        row.actuallyPaid ??
+                        row.amount ??
+                        0
+                    );
+            }
+        });
+
         /*
-         * Selected maintenance month is the
-         * STARTING month.
-         *
-         * Example:
-         *
-         * Selected = 2025-08
-         * Current  = 2026-08
-         *
-         * Maintenance must be calculated from
-         * August 2025 through August 2026.
-         */
-
-        const [selectedYear, selectedMonth] =
-            maintenanceMonth
-                .split("-")
-                .map(Number);
-
-
-        /*
-         * Current month
+         * Calculate the total maintenance
+         * that should have been paid up to
+         * the current month.
          */
 
         const today = new Date();
@@ -1327,93 +1423,22 @@ async function calculatePreviousBalance() {
         const currentMonth =
             today.getMonth() + 1;
 
-
-        /*
-         * Convert both dates into a month index.
-         */
-
-        const selectedPeriod =
-            (selectedYear * 12) +
-            (selectedMonth - 1);
-
-        const currentPeriod =
-            (currentYear * 12) +
-            (currentMonth - 1);
-
-
-        /*
-         * If selected month is in the future,
-         * nothing is due yet.
-         */
-
-        if (selectedPeriod > currentPeriod) {
-
-            document.getElementById("previousBalance").value = 0;
-            document.getElementById("balance").value = 0;
-
-            return;
-        }
-
-
-        /*
-         * Monthly maintenance for this flat.
-         */
-
         const monthlyDue =
-            maintenanceRates[flat] || 0;
-
-
-        /*
-         * Number of maintenance months
-         * from selected month through current month.
-         *
-         * Example:
-         *
-         * Aug 2025 -> Aug 2026
-         *
-         * = 13 months
-         */
-
-        const monthsDue =
-            currentPeriod -
-            selectedPeriod +
-            1;
-
-
-        /*
-         * Total maintenance due from the
-         * selected month through current month.
-         */
-
-        const totalDue =
-            monthlyDue *
-            monthsDue;
-
-
-        /*
-         * Read all ledger records from Firestore.
-         */
-
-        const snapshot =
-            await getDocs(
-                collection(db, "ledger")
+            Number(
+                maintenanceRates[flat] || 0
             );
 
-
         /*
-         * Calculate all payments made for
-         * this owner + flat from the selected
-         * maintenance month through current month.
+         * Find the earliest maintenance
+         * month recorded for this owner.
          */
 
-        let totalPaid = 0;
+        let earliestPeriod = null;
 
-
-        snapshot.forEach((document) => {
+        snapshot.forEach((documentSnapshot) => {
 
             const row =
-                document.data();
-
+                documentSnapshot.data();
 
             if (
                 row.owner === owner &&
@@ -1422,76 +1447,66 @@ async function calculatePreviousBalance() {
                 row.maintenanceMonth
             ) {
 
-                const [
-                    rowYear,
-                    rowMonth
-                ] =
+                const [year, month] =
                     row.maintenanceMonth
                         .split("-")
                         .map(Number);
 
-
-                const rowPeriod =
-                    (rowYear * 12) +
-                    (rowMonth - 1);
-
-
-                /*
-                 * Count only payments between
-                 * selected month and current month.
-                 */
+                const period =
+                    (year * 12) +
+                    (month - 1);
 
                 if (
-                    rowPeriod >= selectedPeriod &&
-                    rowPeriod <= currentPeriod
+                    earliestPeriod === null ||
+                    period < earliestPeriod
                 ) {
-
-                    const paid =
-                        Number(
-                            row.actuallyPaid ??
-                            row.amount ??
-                            0
-                        );
-
-
-                    totalPaid += paid;
-
+                    earliestPeriod = period;
                 }
-
             }
-
         });
 
-
         /*
-         * Outstanding as of current month.
+         * If there are no previous records,
+         * there is no previous outstanding.
          */
+
+        if (earliestPeriod === null) {
+
+            document.getElementById(
+                "previousBalance"
+            ).value = 0;
+
+            document.getElementById(
+                "balance"
+            ).value = 0;
+
+            return;
+        }
+
+        const currentPeriod =
+            (currentYear * 12) +
+            (currentMonth - 1);
+
+        const monthsDue =
+            currentPeriod -
+            earliestPeriod +
+            1;
+
+        const totalDue =
+            monthlyDue *
+            monthsDue;
 
         const outstanding =
             totalDue -
             totalPaid;
 
-
-        /*
-         * For a historical starting month,
-         * there is no outstanding before that
-         * selected month.
-         */
-
         document.getElementById(
             "previousBalance"
         ).value = 0;
 
-
-        /*
-         * Show the complete outstanding amount
-         * through the current month.
-         */
-
         document.getElementById(
             "balance"
         ).value = outstanding;
-
 
     } catch (error) {
 
@@ -1504,18 +1519,13 @@ async function calculatePreviousBalance() {
             "Unable to calculate outstanding: " +
             error.message
         );
-
     }
-
 }
 
 // Recalculate when owner changes
+// Recalculate when owner changes
 document.getElementById("owner")
-.addEventListener("change", calculatePreviousBalance);
-
-// Recalculate when maintenance month changes
-document.getElementById("maintenanceMonth")
-.addEventListener("change", calculatePreviousBalance);
+    .addEventListener("change", calculatePreviousBalance);
 
 async function calculateCurrentBalance() {
 
@@ -1525,39 +1535,46 @@ async function calculateCurrentBalance() {
     const flat =
         document.getElementById("flat").value;
 
-    const maintenanceMonth =
-        document.getElementById("maintenanceMonth").value;
-
     const paidNow =
         Number(
             document.getElementById("amount").value
         ) || 0;
 
-
-    if (!owner || !flat || !maintenanceMonth) {
+    if (!owner || !flat) {
 
         document.getElementById("balance").value = "";
 
         return;
     }
 
-
     try {
 
-        /*
-         * Selected maintenance month
-         * is the starting month.
-         */
+        const snapshot =
+            await getDocs(
+                collection(db, "ledger")
+            );
 
-        const [selectedYear, selectedMonth] =
-            maintenanceMonth
-                .split("-")
-                .map(Number);
+        let totalPaid = 0;
 
+        snapshot.forEach((documentSnapshot) => {
 
-        /*
-         * Current month
-         */
+            const row =
+                documentSnapshot.data();
+
+            if (
+                row.owner === owner &&
+                row.flat === flat &&
+                row.type === "Maintenance Received"
+            ) {
+
+                totalPaid +=
+                    Number(
+                        row.actuallyPaid ??
+                        row.amount ??
+                        0
+                    );
+            }
+        });
 
         const today = new Date();
 
@@ -1567,80 +1584,26 @@ async function calculateCurrentBalance() {
         const currentMonth =
             today.getMonth() + 1;
 
-
-        /*
-         * Convert to month indexes.
-         */
-
-        const selectedPeriod =
-            (selectedYear * 12) +
-            (selectedMonth - 1);
-
         const currentPeriod =
             (currentYear * 12) +
             (currentMonth - 1);
 
-
-        if (selectedPeriod > currentPeriod) {
-
-            document.getElementById("balance").value = 0;
-
-            return;
-        }
-
-
-        /*
-         * Monthly maintenance for this flat.
-         */
-
         const monthlyDue =
-            maintenanceRates[flat] || 0;
-
-
-        /*
-         * Number of months from the
-         * selected month through current month.
-         */
-
-        const monthsDue =
-            currentPeriod -
-            selectedPeriod +
-            1;
-
-
-        /*
-         * Total maintenance due.
-         */
-
-        const totalDue =
-            monthlyDue *
-            monthsDue;
-
-
-        /*
-         * Get all ledger records.
-         */
-
-        const snapshot =
-            await getDocs(
-                collection(db, "ledger")
+            Number(
+                maintenanceRates[flat] || 0
             );
 
-
         /*
-         * Calculate all payments already
-         * recorded for this owner + flat
-         * during the selected period.
+         * Find the earliest maintenance
+         * month recorded for this owner.
          */
 
-        let totalPaid = 0;
+        let earliestPeriod = null;
 
-
-        snapshot.forEach((document) => {
+        snapshot.forEach((documentSnapshot) => {
 
             const row =
-                document.data();
-
+                documentSnapshot.data();
 
             if (
                 row.owner === owner &&
@@ -1649,66 +1612,52 @@ async function calculateCurrentBalance() {
                 row.maintenanceMonth
             ) {
 
-                const [
-                    rowYear,
-                    rowMonth
-                ] =
+                const [year, month] =
                     row.maintenanceMonth
                         .split("-")
                         .map(Number);
 
-
-                const rowPeriod =
-                    (rowYear * 12) +
-                    (rowMonth - 1);
-
+                const period =
+                    (year * 12) +
+                    (month - 1);
 
                 if (
-                    rowPeriod >= selectedPeriod &&
-                    rowPeriod <= currentPeriod
+                    earliestPeriod === null ||
+                    period < earliestPeriod
                 ) {
-
-                    const paid =
-                        Number(
-                            row.actuallyPaid ??
-                            row.amount ??
-                            0
-                        );
-
-
-                    totalPaid += paid;
-
+                    earliestPeriod = period;
                 }
-
             }
-
         });
 
+        if (earliestPeriod === null) {
 
-        /*
-         * Current Outstanding before
-         * the new payment.
-         */
+            document.getElementById(
+                "balance"
+            ).value =
+                -paidNow;
 
-        const outstandingBeforeNewPayment =
-            totalDue -
-            totalPaid;
+            return;
+        }
 
+        const monthsDue =
+            currentPeriod -
+            earliestPeriod +
+            1;
 
-        /*
-         * Subtract the amount currently
-         * being entered.
-         */
+        const totalDue =
+            monthlyDue *
+            monthsDue;
 
         const currentBalance =
-            outstandingBeforeNewPayment -
+            totalDue -
+            totalPaid -
             paidNow;
-
 
         document.getElementById(
             "balance"
-        ).value = currentBalance;
-
+        ).value =
+            currentBalance;
 
     } catch (error) {
 
@@ -1718,7 +1667,6 @@ async function calculateCurrentBalance() {
         );
 
     }
-
 }
 
 async function recalculateLedger() {
@@ -1997,7 +1945,6 @@ async function recalculateLedger() {
     }
 
 }
-
 async function add() {
 
     const owner =
@@ -2006,9 +1953,6 @@ async function add() {
     const date =
         document.getElementById("date").value;
 
-    const maintenanceMonth =
-        document.getElementById("maintenanceMonth").value;
-
     const flat =
         document.getElementById("flat").value;
 
@@ -2016,20 +1960,42 @@ async function add() {
         document.getElementById("type").value;
 
     const amount =
-        Number(document.getElementById("amount").value) || 0;
+        Number(
+            document.getElementById("amount").value
+        ) || 0;
 
     const remarks =
         document.getElementById("remarks").value;
 
 
     // -----------------------------
+    // SELECTED MAINTENANCE MONTHS
+    // -----------------------------
+
+    const selectedMonths =
+        Array.from(
+            document.querySelectorAll(
+                ".maintenance-month-checkbox:checked"
+            )
+        ).map(
+            checkbox => checkbox.value
+        );
+
+
+    // -----------------------------
     // VALIDATION
     // -----------------------------
 
-    if (!owner || !date || !maintenanceMonth || !flat || amount <= 0) {
+    if (
+        !owner ||
+        !date ||
+        !flat ||
+        selectedMonths.length === 0 ||
+        amount <= 0
+    ) {
 
         alert(
-            "Please select Owner, Maintenance Month, Date, Flat and enter Amount."
+            "Please select Owner, at least one Maintenance Month, Date, Flat and enter Amount."
         );
 
         return;
@@ -2039,200 +2005,62 @@ async function add() {
     try {
 
         // -----------------------------
-        // CHECK EXISTING RECORDS
-        // -----------------------------
-
-        const snapshot =
-            await getDocs(
-                collection(db, "ledger")
-            );
-
-
-        let totalPaid = 0;
-
-
-        // -----------------------------
-        // CURRENT MONTH
-        // -----------------------------
-
-        const today = new Date();
-
-        const currentYear =
-            today.getFullYear();
-
-        const currentMonth =
-            today.getMonth() + 1;
-
-
-        // -----------------------------
+        // ADD ONE RECORD FOR EACH
         // SELECTED MAINTENANCE MONTH
         // -----------------------------
 
-        const [selectedYear, selectedMonth] =
-            maintenanceMonth
-                .split("-")
-                .map(Number);
+        const amountPerMonth =
+            amount / selectedMonths.length;
 
 
-        const selectedPeriod =
-            (selectedYear * 12) +
-            (selectedMonth - 1);
+        for (const maintenanceMonth of selectedMonths) {
 
+            await addDoc(
+                collection(db, "ledger"),
+                {
 
-        const currentPeriod =
-            (currentYear * 12) +
-            (currentMonth - 1);
+                    owner:
+                        owner,
 
+                    maintenanceMonth:
+                        maintenanceMonth,
 
-        // -----------------------------
-        // MONTHLY MAINTENANCE
-        // -----------------------------
+                    date:
+                        date,
 
-        const monthlyDue =
-            maintenanceRates[flat] || 0;
+                    flat:
+                        flat,
 
+                    type:
+                        type,
 
-        let totalDue = 0;
+                    amount:
+                        amountPerMonth,
 
+                    maintenanceDue:
+                        maintenanceRates[flat] || 0,
 
-        // If selected month is current or past
-        if (selectedPeriod <= currentPeriod) {
+                    actuallyPaid:
+                        type === "Maintenance Received"
+                            ? amountPerMonth
+                            : 0,
 
-            const monthsDue =
-                currentPeriod -
-                selectedPeriod +
-                1;
+                    previousBalance:
+                        0,
 
-            totalDue =
-                monthlyDue *
-                monthsDue;
+                    balance:
+                        0,
 
-        }
+                    remarks:
+                        remarks,
 
-
-        // -----------------------------
-        // ADD ALL PREVIOUS PAYMENTS
-        // FOR THIS OWNER + FLAT
-        // -----------------------------
-
-        snapshot.forEach((documentSnapshot) => {
-
-            const row =
-                documentSnapshot.data();
-
-
-            if (
-                row.owner === owner &&
-                row.flat === flat &&
-                row.type === "Maintenance Received" &&
-                row.maintenanceMonth
-            ) {
-
-                const [
-                    rowYear,
-                    rowMonth
-                ] =
-                    row.maintenanceMonth
-                        .split("-")
-                        .map(Number);
-
-
-                const rowPeriod =
-                    (rowYear * 12) +
-                    (rowMonth - 1);
-
-
-                if (
-                    rowPeriod >= selectedPeriod &&
-                    rowPeriod <= currentPeriod
-                ) {
-
-                    totalPaid +=
-                        Number(
-                            row.actuallyPaid ??
-                            row.amount ??
-                            0
-                        );
+                    createdAt:
+                        new Date()
 
                 }
-
-            }
-
-        });
-
-
-        // -----------------------------
-        // PREVIOUS OUTSTANDING
-        // -----------------------------
-
-        const previousBalance = 0;
-
-
-        // -----------------------------
-        // CURRENT OUTSTANDING
-        // -----------------------------
-
-        let currentBalance = 0;
-
-
-        if (type === "Maintenance Received") {
-
-            currentBalance =
-                totalDue -
-                totalPaid -
-                amount;
+            );
 
         }
-
-
-        // -----------------------------
-        // SAVE TO FIRESTORE
-        // -----------------------------
-
-        await addDoc(
-            collection(db, "ledger"),
-            {
-
-                owner:
-                    owner,
-
-                maintenanceMonth:
-                    maintenanceMonth,
-
-                date:
-                    date,
-
-                flat:
-                    flat,
-
-                type:
-                    type,
-
-                amount:
-                    amount,
-
-                maintenanceDue:
-                    monthlyDue,
-
-                actuallyPaid:
-                    type === "Maintenance Received"
-                        ? amount
-                        : 0,
-
-                previousBalance:
-                    previousBalance,
-
-                balance:
-                    currentBalance,
-
-                remarks:
-                    remarks,
-
-                createdAt:
-                    new Date()
-
-            }
-        );
 
 
         // -----------------------------
@@ -2250,8 +2078,6 @@ async function add() {
 
         document.getElementById("owner").value = "";
 
-        document.getElementById("maintenanceMonth").value = "";
-
         document.getElementById("date").value = "";
 
         document.getElementById("flat").value = "";
@@ -2268,6 +2094,10 @@ async function add() {
         document.getElementById("balance").value = "";
 
         document.getElementById("remarks").value = "";
+
+        document.getElementById(
+            "maintenanceMonthsContainer"
+        ).innerHTML = "";
 
 
         // -----------------------------
@@ -2292,7 +2122,6 @@ async function add() {
     }
 
 }
-
 async function loadLedger() {
 
     const tbody =
@@ -2384,7 +2213,6 @@ async function loadLedger() {
 
     }
 }
-
 function filterLedger() {
 
     const selectedOwner =
@@ -2415,7 +2243,6 @@ function filterLedger() {
 
     displayLedger(filteredRecords);
 }
-
 function displayLedger(records) {
 
     const tbody =
@@ -2537,7 +2364,6 @@ function displayLedger(records) {
     });
 
 }
-
 async function deleteEntry(recordId) {
 
     if (!window.isAdmin) {
@@ -2583,8 +2409,6 @@ async function deleteEntry(recordId) {
 
     }
 }
-
-
 async function editEntry(recordId) {
 
     if (!window.isAdmin) {
@@ -2637,8 +2461,6 @@ editingRecordId = recordId;
     );
     document.getElementById("saveEditButton").style.display = "inline-block";
 }
-
-
 async function saveEditedEntry() {
 
     if (!window.isAdmin) {
@@ -3057,26 +2879,6 @@ function clearFilters() {
     displayLedger(window.ledgerRecords);
 
 }
-
-/*async function loadFlats() {
-const select = document.getElementById("flat");
-
-select.innerHTML = '<option value="">Select Flat</option>';  
-
-const snapshot = await getDocs(collection(db, "flats"));  
-
-snapshot.forEach((doc) => {  
-    const flat = doc.data();  
-
-    const option = document.createElement("option");  
-    option.value = flat.floor;  
-    option.textContent = flat.floor;  
-
-    select.appendChild(option);  
-});
-
-}*/
-
 async function download() {
 
     try {
@@ -3325,8 +3127,6 @@ async function download() {
     }
 
 }
-
-
 async function calculatePendingSummary() {
 
     const selectedOwner =
@@ -4602,7 +4402,7 @@ async function calculateBalanceSheet() {
     try {
 
         // -----------------------------------------
-        // CREATE SELECTED MONTH
+        // SELECTED YEAR + MONTH
         // -----------------------------------------
 
         const selectedMonth =
@@ -4610,12 +4410,22 @@ async function calculateBalanceSheet() {
 
 
         // -----------------------------------------
-        // GET ALL LEDGER RECORDS
+        // GET MAINTENANCE LEDGER
         // -----------------------------------------
 
-        const snapshot =
+        const ledgerSnapshot =
             await getDocs(
                 collection(db, "ledger")
+            );
+
+
+        // -----------------------------------------
+        // GET MONTHLY EXPENSES
+        // -----------------------------------------
+
+        const expenseSnapshot =
+            await getDocs(
+                collection(db, "monthlyExpenses")
             );
 
 
@@ -4625,18 +4435,19 @@ async function calculateBalanceSheet() {
 
 
         // -----------------------------------------
-        // PROCESS DATABASE RECORDS
+        // CALCULATE MAINTENANCE RECEIVED
         // -----------------------------------------
 
-        snapshot.forEach((documentSnapshot) => {
+        ledgerSnapshot.forEach((documentSnapshot) => {
 
             const row =
                 documentSnapshot.data();
 
 
-            // -------------------------------------
-            // MAINTENANCE COLLECTION
-            // -------------------------------------
+            /*
+             * Only Maintenance Received records
+             * for the EXACT selected YYYY-MM.
+             */
 
             if (
                 row.type === "Maintenance Received" &&
@@ -4655,42 +4466,48 @@ async function calculateBalanceSheet() {
 
             }
 
+        });
 
-            // -------------------------------------
-            // BUILDING EXPENSE
-            // -------------------------------------
+
+        // -----------------------------------------
+        // CALCULATE MONTHLY EXPENSE
+        // -----------------------------------------
+
+        expenseSnapshot.forEach((documentSnapshot) => {
+
+            const row =
+                documentSnapshot.data();
+
+
+            /*
+             * Only expenses for the EXACT
+             * selected YYYY-MM.
+             */
 
             if (
-                row.type === "Building Expense"
+                row.month === selectedMonth
             ) {
 
-                /*
-                 * Building expenses currently don't
-                 * have a maintenanceMonth field in
-                 * your addBuildingExpense() function.
-                 *
-                 * Therefore we will only include an
-                 * expense if it has a matching month.
-                 */
-
-                if (
-                    row.expenseMonth === selectedMonth
-                ) {
-
-                    const paid =
-                        Number(
-                            row.expensePaid ??
-                            0
-                        );
+                const amount =
+                    Number(
+                        row.amount
+                    ) || 0;
 
 
-                    totalExpense += paid;
-
-                }
+                totalExpense += amount;
 
             }
 
         });
+
+
+        // -----------------------------------------
+        // CALCULATE BALANCE
+        // -----------------------------------------
+
+        const monthlyBalance =
+            totalCollection -
+            totalExpense;
 
 
         // -----------------------------------------
@@ -4703,7 +4520,7 @@ async function calculateBalanceSheet() {
 
                 <td>
                     <strong>
-                        Total Monthly Maintenance Collection
+                        Maintenance Received
                     </strong>
                 </td>
 
@@ -4718,12 +4535,29 @@ async function calculateBalanceSheet() {
 
                 <td>
                     <strong>
-                        Total Monthly Building Expense
+                        Building Expenses
                     </strong>
                 </td>
 
                 <td>
                     ₹${totalExpense}
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>
+                    <strong>
+                        Monthly Balance
+                    </strong>
+                </td>
+
+                <td>
+                    <strong>
+                        ₹${monthlyBalance}
+                    </strong>
                 </td>
 
             </tr>
